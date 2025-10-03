@@ -38,10 +38,8 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
-  experimental: {
-    serverComponentsExternalPackages: ["cheerio"],
-  },
-  // Next.js 15 has better Edge Runtime support
+  // Next.js 15 configuration
+  serverExternalPackages: ["cheerio"],
   poweredByHeader: false,
   reactStrictMode: true,
 };
