@@ -3,6 +3,8 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 import { scrapeAllSources } from "@/lib/simple-scraper";
 import { analyzeContent } from "@/lib/gemini";
 
+export const runtime = "nodejs";
+
 export async function POST(request: NextRequest) {
   try {
     // Verify cron secret for security

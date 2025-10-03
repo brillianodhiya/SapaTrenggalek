@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
+export const runtime = "nodejs";
+
 export async function POST(request: NextRequest) {
   try {
     // Security check - only allow in development or with admin secret

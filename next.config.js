@@ -13,6 +13,7 @@ const nextConfig = {
         fs: false,
         net: false,
         tls: false,
+        url: false,
       };
     }
 
@@ -28,6 +29,10 @@ const nextConfig = {
   swcMinify: true,
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
+  },
+  // Specify runtime for API routes to avoid Edge Runtime warnings
+  experimental: {
+    runtime: "nodejs",
   },
 };
 
