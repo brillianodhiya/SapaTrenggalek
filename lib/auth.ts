@@ -1,8 +1,6 @@
 import { getServerSession } from "next-auth/next";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
-import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -18,19 +16,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          // Get user from database
-          const { data: user, error } = await supabaseAdmin
-            .from("admin_users")
-            .select("*")
-            .eq("email", credentials.email)
-            .eq("is_active", true)
-            .single();
-
-          if (error || !user) {
-            return null;
-          }
-
-          // Check password (for demo, we'll create a default admin)
+          // Demo credentials check (simple & reliable)
           if (
             credentials.email === "admin@trenggalek.go.id" &&
             credentials.password === "admin123"
@@ -59,19 +45,20 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
+      if (user && "role" in user) {
         token.role = user.role;
       }
       return token;
     },
     async session({ session, token }) {
-      if (token) {
-        session.user.id = token.sub;
-        session.user.role = token.role;
+      if (token && session.user) {
+        session.user.id = token.sub || "";
+        session.user.role = (token.role as string) || "admin";
       }
       return session;
     },
   },
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
 export const getServerAuthSession = () => getServerSession(authOptions);

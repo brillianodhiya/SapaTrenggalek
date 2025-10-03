@@ -14,6 +14,13 @@ const nextConfig = {
         net: false,
         tls: false,
         url: false,
+        crypto: false,
+        stream: false,
+        http: false,
+        https: false,
+        zlib: false,
+        path: false,
+        os: false,
       };
     }
 
@@ -22,6 +29,7 @@ const nextConfig = {
     config.externals.push({
       undici: "undici",
       cheerio: "cheerio",
+      bcryptjs: "bcryptjs",
     });
 
     return config;
@@ -30,9 +38,9 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
-  // Specify runtime for API routes to avoid Edge Runtime warnings
   experimental: {
-    runtime: "nodejs",
+    webpackBuildWorker: true,
+    serverComponentsExternalPackages: ["bcryptjs"],
   },
 };
 
