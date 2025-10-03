@@ -21,6 +21,8 @@ const nextConfig = {
         zlib: false,
         path: false,
         os: false,
+        buffer: false,
+        util: false,
       };
     }
 
@@ -29,19 +31,19 @@ const nextConfig = {
     config.externals.push({
       undici: "undici",
       cheerio: "cheerio",
-      bcryptjs: "bcryptjs",
     });
 
     return config;
   },
-  swcMinify: true,
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
   experimental: {
-    webpackBuildWorker: true,
-    serverComponentsExternalPackages: ["bcryptjs"],
+    serverComponentsExternalPackages: ["cheerio"],
   },
+  // Next.js 15 has better Edge Runtime support
+  poweredByHeader: false,
+  reactStrictMode: true,
 };
 
 module.exports = nextConfig;
