@@ -10,6 +10,8 @@ import {
   Home,
   AlertTriangle,
   TrendingUp,
+  Search,
+  Zap,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -24,8 +26,10 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
     { id: "dashboard", label: "Dashboard", icon: Home },
     { id: "data", label: "Data Monitoring", icon: Database },
     { id: "analytics", label: "Analitik", icon: BarChart3 },
+    { id: "search", label: "Vector Search", icon: Search },
     { id: "urgent", label: "Item Mendesak", icon: AlertTriangle },
     { id: "trends", label: "Tren & Isu", icon: TrendingUp },
+    { id: "embeddings", label: "Embeddings", icon: Zap },
     { id: "settings", label: "Pengaturan", icon: Settings },
   ];
 

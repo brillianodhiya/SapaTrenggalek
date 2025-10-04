@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { analyzeContentWithSimilarity, generateEmbedding } from "./embeddings";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
@@ -32,17 +33,57 @@ Kriteria:
 `;
 
   try {
+    // First, check for similarity and potential hoax
+    const similarityAnalysis = await analyzeContentWithSimilarity(
+      content,
+      source
+    );
+
+    // If it's a duplicate, return early
+    if (similarityAnalysis.isDuplicate) {
+      return {
+        category: "lainnya",
+        sentiment: "netral",
+        urgency_level: 1,
+        hoax_probability: 0,
+        keywords: [],
+        summary: "Konten duplikat",
+        reasoning: "Konten sudah ada di database",
+        isDuplicate: true,
+        duplicateOf: similarityAnalysis.duplicateOf,
+      };
+    }
+
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
 
     // Parse JSON response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
+    let analysis;
+
     if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]);
+      analysis = JSON.parse(jsonMatch[0]);
+    } else {
+      throw new Error("Invalid JSON response from AI");
     }
 
-    throw new Error("Invalid JSON response from AI");
+    // Enhance hoax probability based on similarity to known hoax content
+    if (similarityAnalysis.isPotentialHoax) {
+      analysis.hoax_probability = Math.max(
+        analysis.hoax_probability,
+        Math.round(similarityAnalysis.hoaxConfidence * 100)
+      );
+      analysis.reasoning += ` | Mirip dengan konten hoax yang sudah terdeteksi (confidence: ${Math.round(
+        similarityAnalysis.hoaxConfidence * 100
+      )}%)`;
+    }
+
+    // Add similarity context
+    analysis.similarContent = similarityAnalysis.similarContent;
+    analysis.hoaxSimilarContent = similarityAnalysis.hoaxSimilarContent;
+
+    return analysis;
   } catch (error) {
     console.error("Error analyzing content:", error);
     // Fallback analysis

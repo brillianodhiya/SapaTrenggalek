@@ -7,6 +7,8 @@ import Sidebar from "@/components/Sidebar";
 import Dashboard from "@/components/Dashboard";
 import DataTable from "@/components/DataTable";
 import DatabaseManager from "@/components/DatabaseManager";
+import VectorSearch from "@/components/VectorSearch";
+import EmbeddingManager from "@/components/EmbeddingManager";
 import { LogOut, User } from "lucide-react";
 
 export default function AdminPage() {
@@ -61,6 +63,18 @@ export default function AdminPage() {
               Fitur ini akan menampilkan analisis tren dan isu yang sedang
               viral.
             </p>
+          </div>
+        );
+      case "search":
+        return (
+          <div className="space-y-6">
+            <VectorSearch />
+          </div>
+        );
+      case "embeddings":
+        return (
+          <div className="space-y-6">
+            <EmbeddingManager />
           </div>
         );
       case "settings":

@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "setup-db": "node scripts/setup-database.js",
+    "setup-vector": "node scripts/setup-vector-database.js",
     "generate-secrets": "node scripts/generate-secrets.js",
     "upgrade-nextjs": "node scripts/upgrade-nextjs15.js",
     "cleanup-db": "curl -X POST http://localhost:3000/api/admin/cleanup-database",
