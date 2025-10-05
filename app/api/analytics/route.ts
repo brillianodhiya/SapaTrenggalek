@@ -3,7 +3,9 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export const runtime = "nodejs";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const range = searchParams.get("range") || "7d";
   try {
     // Check if Supabase is configured
     if (
@@ -68,25 +70,62 @@ export async function GET() {
       .order("hoax_probability", { ascending: false })
       .limit(10);
 
-    // Get daily trends (last 7 days)
-    const { data: dailyTrends } = await supabaseAdmin
+    // Get daily trends based on selected range
+    const getDaysFromRange = (range: string) => {
+      switch (range) {
+        case "30d":
+          return 30;
+        case "90d":
+          return 90;
+        case "1y":
+          return 365;
+        default:
+          return 7;
+      }
+    };
+
+    const days = getDaysFromRange(range);
+    const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    const { data: dailyTrends, error: trendsError } = await supabaseAdmin
       .from("data_entries")
       .select("created_at, category")
-      .gte(
-        "created_at",
-        new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
-      )
+      .gte("created_at", startDate.toISOString())
       .order("created_at", { ascending: true });
 
-    // Process daily trends
-    const trendData = dailyTrends?.reduce((acc, item) => {
-      const date = new Date(item.created_at).toISOString().split("T")[0];
-      if (!acc[date]) {
-        acc[date] = { date, berita: 0, laporan: 0, aspirasi: 0, lainnya: 0 };
-      }
-      acc[date][item.category as keyof (typeof acc)[typeof date]]++;
-      return acc;
-    }, {} as Record<string, any>);
+    console.log("Daily trends query result:", {
+      count: dailyTrends?.length,
+      error: trendsError,
+      range: range,
+      startDate: startDate.toISOString(),
+      sampleData: dailyTrends?.slice(0, 3).map((item) => ({
+        date: item.created_at,
+        category: item.category,
+      })),
+    });
+
+    // Create daily trends array based on selected range
+    const dailyTrendsArray = [];
+    const displayDays = Math.min(days, 30); // Limit display to max 30 days for readability
+    for (let i = displayDays - 1; i >= 0; i--) {
+      const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+      const dateStr = date.toISOString().split("T")[0];
+
+      // Count entries for this date
+      const dayCount =
+        dailyTrends?.filter((item) => {
+          const itemDate = new Date(item.created_at)
+            .toISOString()
+            .split("T")[0];
+          return itemDate === dateStr;
+        }).length || 0;
+
+      dailyTrendsArray.push({
+        date: dateStr,
+        count: dayCount,
+      });
+    }
+
+    console.log("Generated daily trends array:", dailyTrendsArray);
 
     // Get source distribution
     const { data: sourceData } = await supabaseAdmin
@@ -105,11 +144,7 @@ export async function GET() {
       .slice(0, 5)
       .map(([source, count]) => ({ source, count }));
 
-    // Convert daily trends to simple format
-    const dailyTrendsArray = Object.values(trendData || {}).map((day: any) => ({
-      date: day.date,
-      count: day.berita + day.laporan + day.aspirasi + day.lainnya,
-    }));
+    // dailyTrendsArray is already created above
 
     return NextResponse.json({
       totalEntries: categoryData?.length || 0,

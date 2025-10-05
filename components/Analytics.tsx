@@ -37,6 +37,8 @@ export default function Analytics() {
     try {
       const response = await fetch(`/api/analytics?range=${timeRange}`);
       const result = await response.json();
+      console.log("Analytics data received:", result);
+      console.log("Daily trends data:", result.dailyTrends);
       setData(result);
     } catch (error) {
       console.error("Error fetching analytics:", error);
@@ -161,9 +163,12 @@ export default function Analytics() {
             <div>
               <p className="text-green-100">Completion Rate</p>
               <p className="text-2xl font-bold">
-                {Math.round(
-                  (data.statusBreakdown.selesai / data.totalEntries) * 100
-                )}
+                {data.totalEntries > 0 &&
+                data.statusBreakdown.selesai !== undefined
+                  ? Math.round(
+                      (data.statusBreakdown.selesai / data.totalEntries) * 100
+                    )
+                  : 0}
                 %
               </p>
             </div>
@@ -197,7 +202,11 @@ export default function Analytics() {
                       <div
                         className="bg-primary-500 h-2 rounded-full"
                         style={{
-                          width: `${(count / data.totalEntries) * 100}%`,
+                          width: `${
+                            data.totalEntries > 0
+                              ? (count / data.totalEntries) * 100
+                              : 0
+                          }%`,
                         }}
                       ></div>
                     </div>
@@ -245,7 +254,11 @@ export default function Analytics() {
                             colors[sentiment as keyof typeof colors]
                           } h-2 rounded-full`}
                           style={{
-                            width: `${(count / data.totalEntries) * 100}%`,
+                            width: `${
+                              data.totalEntries > 0
+                                ? (count / data.totalEntries) * 100
+                                : 0
+                            }%`,
                           }}
                         ></div>
                       </div>
@@ -295,7 +308,11 @@ export default function Analytics() {
                           statusColors[status as keyof typeof statusColors]
                         } h-2 rounded-full`}
                         style={{
-                          width: `${(count / data.totalEntries) * 100}%`,
+                          width: `${
+                            data.totalEntries > 0
+                              ? (count / data.totalEntries) * 100
+                              : 0
+                          }%`,
                         }}
                       ></div>
                     </div>
@@ -331,7 +348,9 @@ export default function Analytics() {
                       className="bg-primary-500 h-2 rounded-full"
                       style={{
                         width: `${
-                          (source.count / data.topSources[0].count) * 100
+                          data.topSources[0]?.count > 0
+                            ? (source.count / data.topSources[0].count) * 100
+                            : 0
                         }%`,
                       }}
                     ></div>
@@ -348,32 +367,69 @@ export default function Analytics() {
       <div className="card">
         <h3 className="text-lg font-semibold mb-4 flex items-center">
           <Calendar className="h-5 w-5 mr-2" />
-          Tren Harian
+          Tren Harian (7 Hari Terakhir)
         </h3>
-        <div className="h-64 flex items-end justify-between space-x-2">
-          {data.dailyTrends.map((day, index) => {
-            const maxCount = Math.max(...data.dailyTrends.map((d) => d.count));
-            const height = (day.count / maxCount) * 100;
-            return (
-              <div key={index} className="flex-1 flex flex-col items-center">
-                <div
-                  className="w-full bg-primary-500 rounded-t transition-all duration-300 hover:bg-primary-600"
-                  style={{ height: `${height}%` }}
-                  title={`${day.count} entries`}
-                ></div>
-                <span className="text-xs text-gray-500 mt-2">
-                  {new Date(day.date).toLocaleDateString("id-ID", {
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </span>
-                <span className="text-xs font-bold text-gray-700">
-                  {day.count}
-                </span>
-              </div>
-            );
-          })}
-        </div>
+        {data.dailyTrends && data.dailyTrends.length > 0 ? (
+          <div className="h-64 flex items-end justify-between space-x-1 px-2 border border-gray-200 rounded">
+            {data.dailyTrends.map((day, index) => {
+              const maxCount = Math.max(
+                ...data.dailyTrends.map((d) => d.count)
+              );
+              // Calculate height as percentage, with minimum 15% for visibility
+              let height = 0;
+              if (maxCount > 0 && day.count > 0) {
+                height = Math.max((day.count / maxCount) * 85, 15); // 85% max, 15% min
+              } else if (day.count === 0) {
+                height = 3; // Small bar for zero values
+              }
+
+              console.log(
+                `Day ${index}: date=${day.date}, count=${day.count}, maxCount=${maxCount}, height=${height}%`
+              );
+
+              return (
+                <div key={index} className="flex-1 flex flex-col items-center">
+                  <div
+                    className={`w-full rounded-t transition-all duration-300 hover:opacity-80 ${
+                      day.count > 0
+                        ? "bg-blue-500 hover:bg-blue-600"
+                        : "bg-gray-300"
+                    }`}
+                    style={{
+                      height:
+                        day.count > 0 ? `${Math.max(height, 20)}px` : "8px",
+                      maxHeight: "200px",
+                    }}
+                    title={`${day.count} entries pada ${new Date(
+                      day.date
+                    ).toLocaleDateString("id-ID")}`}
+                  ></div>
+                  <span className="text-xs text-gray-500 mt-2">
+                    {new Date(day.date).toLocaleDateString("id-ID", {
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </span>
+                  <span className="text-xs font-bold text-gray-700">
+                    {day.count}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="h-64 flex items-center justify-center">
+            <div className="text-center">
+              <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500">
+                Belum ada data untuk 7 hari terakhir
+              </p>
+              <p className="text-sm text-gray-400 mt-1">
+                Data akan muncul setelah ada entries baru
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

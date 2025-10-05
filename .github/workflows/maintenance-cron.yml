@@ -1,21 +1,21 @@
-name: Scheduled Data Scraping
+name: Scheduled Maintenance
 
 on:
   schedule:
-    # Run every 6 hours (adjust as needed)
-    - cron: "0 */6 * * *"
+    # Run daily at 2 AM UTC (9 AM WIB)
+    - cron: "0 2 * * *"
   workflow_dispatch: # Allow manual trigger
 
 jobs:
-  scrape-data:
+  maintenance:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Trigger Scraping API
+      - name: Trigger Maintenance API
         run: |
-          echo "🚀 Starting scraping cronjob..."
+          echo "🔧 Starting maintenance cronjob..."
 
-          response=$(curl -s -w "\n%{http_code}" -X POST "${{ secrets.SCRAPING_ENDPOINT }}" \
+          response=$(curl -s -w "\n%{http_code}" -X POST "${{ secrets.MAINTENANCE_ENDPOINT }}" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json" \
             -d '{"source": "github-actions", "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}')
@@ -27,13 +27,13 @@ jobs:
           echo "📋 Response Body: $body"
 
           if [ "$http_code" -eq 200 ]; then
-            echo "✅ Scraping completed successfully"
+            echo "✅ Maintenance completed successfully"
           else
-            echo "❌ Scraping failed with code $http_code"
+            echo "❌ Maintenance failed with code $http_code"
             exit 1
           fi
 
       - name: Log Completion
         if: always()
         run: |
-          echo "🎉 Scraping cronjob workflow completed at $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo "🎉 Maintenance cronjob workflow completed at $(date -u +%Y-%m-%dT%H:%M:%SZ)"

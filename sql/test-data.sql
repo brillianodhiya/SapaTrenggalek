@@ -5,35 +5,40 @@
 -- SAMPLE DATA FOR TESTING
 -- ============================================================================
 
--- Insert sample data entries for testing
-INSERT INTO data_entries (content, source, source_url, author, category, sentiment, urgency_level, hoax_probability, status) VALUES
+-- Insert sample data entries for testing (with recent dates for daily trends)
+INSERT INTO data_entries (content, source, source_url, author, category, sentiment, urgency_level, hoax_probability, status, created_at) VALUES
 
--- Berita positif tentang Trenggalek
-('Pemerintah Kabupaten Trenggalek berhasil meraih penghargaan sebagai kabupaten terbaik dalam pengelolaan lingkungan hidup di Jawa Timur. Prestasi ini diraih berkat komitmen kuat dalam menjaga kelestarian alam dan program green city yang berkelanjutan.', 'Portal Berita', 'https://example.com/berita1', 'Admin Portal', 'berita', 'positif', 3, 5, 'diverifikasi'),
+-- Berita positif tentang Trenggalek (recent dates for daily trends)
+('Pemerintah Kabupaten Trenggalek berhasil meraih penghargaan sebagai kabupaten terbaik dalam pengelolaan lingkungan hidup di Jawa Timur. Prestasi ini diraih berkat komitmen kuat dalam menjaga kelestarian alam dan program green city yang berkelanjutan.', 'Portal Berita', 'https://example.com/berita1', 'Admin Portal', 'berita', 'positif', 3, 5, 'diverifikasi', NOW() - INTERVAL '1 day'),
 
-('Wisata Pantai Prigi di Trenggalek semakin ramai dikunjungi wisatawan setelah dilakukan revitalisasi fasilitas. Kini tersedia area parkir yang luas, toilet bersih, dan warung makan yang nyaman untuk pengunjung.', 'Media Lokal', 'https://example.com/berita2', 'Reporter Lokal', 'berita', 'positif', 2, 10, 'diverifikasi'),
+('Wisata Pantai Prigi di Trenggalek semakin ramai dikunjungi wisatawan setelah dilakukan revitalisasi fasilitas. Kini tersedia area parkir yang luas, toilet bersih, dan warung makan yang nyaman untuk pengunjung.', 'Media Lokal', 'https://example.com/berita2', 'Reporter Lokal', 'berita', 'positif', 2, 10, 'diverifikasi', NOW() - INTERVAL '2 days'),
 
 -- Laporan infrastruktur
-('Jalan raya menuju Kecamatan Watulimo mengalami kerusakan parah akibat hujan deras minggu lalu. Beberapa titik jalan berlubang dan membahayakan pengendara. Perlu segera diperbaiki sebelum musim hujan tiba.', 'Laporan Warga', 'https://example.com/laporan1', 'Warga Watulimo', 'laporan', 'negatif', 8, 15, 'baru'),
+('Jalan raya menuju Kecamatan Watulimo mengalami kerusakan parah akibat hujan deras minggu lalu. Beberapa titik jalan berlubang dan membahayakan pengendara. Perlu segera diperbaiki sebelum musim hujan tiba.', 'Laporan Warga', 'https://example.com/laporan1', 'Warga Watulimo', 'laporan', 'negatif', 8, 15, 'baru', NOW() - INTERVAL '3 days'),
 
-('Lampu penerangan jalan di Desa Bendungan mati total sejak 3 hari yang lalu. Warga kesulitan beraktivitas di malam hari dan khawatir dengan keamanan. Mohon segera diperbaiki oleh dinas terkait.', 'Pengaduan Online', 'https://example.com/laporan2', 'Kepala Desa Bendungan', 'laporan', 'negatif', 7, 20, 'diteruskan'),
+('Lampu penerangan jalan di Desa Bendungan mati total sejak 3 hari yang lalu. Warga kesulitan beraktivitas di malam hari dan khawatir dengan keamanan. Mohon segera diperbaiki oleh dinas terkait.', 'Pengaduan Online', 'https://example.com/laporan2', 'Kepala Desa Bendungan', 'laporan', 'negatif', 7, 20, 'diteruskan', NOW() - INTERVAL '4 days'),
 
 -- Aspirasi pembangunan
-('Warga Kecamatan Pogalan mengusulkan pembangunan pasar tradisional baru untuk mendukung ekonomi lokal. Lokasi yang diusulkan strategis dan mudah diakses oleh masyarakat sekitar.', 'Forum Warga', 'https://example.com/aspirasi1', 'Forum Warga Pogalan', 'aspirasi', 'positif', 5, 5, 'dikerjakan'),
+('Warga Kecamatan Pogalan mengusulkan pembangunan pasar tradisional baru untuk mendukung ekonomi lokal. Lokasi yang diusulkan strategis dan mudah diakses oleh masyarakat sekitar.', 'Forum Warga', 'https://example.com/aspirasi1', 'Forum Warga Pogalan', 'aspirasi', 'positif', 5, 5, 'dikerjakan', NOW() - INTERVAL '5 days'),
 
-('Masyarakat Trenggalek meminta pembangunan taman kota yang ramah keluarga dengan fasilitas bermain anak dan jogging track. Hal ini untuk mendukung gaya hidup sehat dan rekreasi keluarga.', 'Media Sosial', 'https://example.com/aspirasi2', 'Komunitas Sehat', 'aspirasi', 'positif', 4, 10, 'baru'),
+('Masyarakat Trenggalek meminta pembangunan taman kota yang ramah keluarga dengan fasilitas bermain anak dan jogging track. Hal ini untuk mendukung gaya hidup sehat dan rekreasi keluarga.', 'Media Sosial', 'https://example.com/aspirasi2', 'Komunitas Sehat', 'aspirasi', 'positif', 4, 10, 'baru', NOW() - INTERVAL '6 days'),
 
 -- Berita netral
-('Bupati Trenggalek mengadakan rapat koordinasi dengan seluruh kepala dinas untuk membahas program kerja tahun depan. Rapat berlangsung di Pendopo Kabupaten dan dihadiri 25 kepala dinas.', 'Humas Pemkab', 'https://example.com/berita3', 'Humas Trenggalek', 'berita', 'netral', 2, 5, 'diverifikasi'),
+('Bupati Trenggalek mengadakan rapat koordinasi dengan seluruh kepala dinas untuk membahas program kerja tahun depan. Rapat berlangsung di Pendopo Kabupaten dan dihadiri 25 kepala dinas.', 'Humas Pemkab', 'https://example.com/berita3', 'Humas Trenggalek', 'berita', 'netral', 2, 5, 'diverifikasi', NOW() - INTERVAL '7 days'),
 
 -- Konten dengan potensi hoax (untuk testing)
-('Beredar kabar bahwa akan ada gempa besar di Trenggalek minggu depan menurut ramalan paranormal terkenal. Warga diminta waspada dan bersiap mengungsi. Informasi ini belum dikonfirmasi BMKG.', 'Media Sosial', 'https://example.com/hoax1', 'Akun Anonim', 'lainnya', 'negatif', 9, 85, 'baru'),
+('Beredar kabar bahwa akan ada gempa besar di Trenggalek minggu depan menurut ramalan paranormal terkenal. Warga diminta waspada dan bersiap mengungsi. Informasi ini belum dikonfirmasi BMKG.', 'Media Sosial', 'https://example.com/hoax1', 'Akun Anonim', 'lainnya', 'negatif', 9, 85, 'baru', NOW()),
 
 -- Berita pembangunan
-('Proyek pembangunan jembatan penghubung antar kecamatan di Trenggalek mencapai progress 75%. Diperkirakan akan selesai pada akhir tahun ini dan akan memperlancar akses transportasi warga.', 'Dinas PU', 'https://example.com/berita4', 'Dinas Pekerjaan Umum', 'berita', 'positif', 3, 5, 'diverifikasi'),
+('Proyek pembangunan jembatan penghubung antar kecamatan di Trenggalek mencapai progress 75%. Diperkirakan akan selesai pada akhir tahun ini dan akan memperlancar akses transportasi warga.', 'Dinas PU', 'https://example.com/berita4', 'Dinas Pekerjaan Umum', 'berita', 'positif', 3, 5, 'diverifikasi', NOW() - INTERVAL '1 day'),
 
 -- Laporan lingkungan
-('Sungai Brantas di wilayah Trenggalek tercemar limbah industri. Warna air berubah kehitaman dan berbau tidak sedap. Ikan-ikan mati dan warga tidak berani menggunakan air sungai.', 'Aktivis Lingkungan', 'https://example.com/laporan3', 'Green Trenggalek', 'laporan', 'negatif', 9, 25, 'diteruskan');
+('Sungai Brantas di wilayah Trenggalek tercemar limbah industri. Warna air berubah kehitaman dan berbau tidak sedap. Ikan-ikan mati dan warga tidak berani menggunakan air sungai.', 'Aktivis Lingkungan', 'https://example.com/laporan3', 'Green Trenggalek', 'laporan', 'negatif', 9, 25, 'diteruskan', NOW() - INTERVAL '2 days'),
+
+-- Additional recent entries for better daily trends
+('Festival budaya Trenggalek akan diselenggarakan bulan depan dengan menampilkan berbagai kesenian tradisional dan kuliner khas daerah.', 'Media Lokal', 'https://example.com/berita5', 'Reporter Budaya', 'berita', 'positif', 3, 5, 'diverifikasi', NOW()),
+('Pembangunan gedung sekolah baru di Kecamatan Munjungan telah dimulai dan diharapkan selesai dalam 6 bulan ke depan.', 'Dinas Pendidikan', 'https://example.com/berita6', 'Dinas Pendidikan', 'berita', 'positif', 4, 5, 'diverifikasi', NOW() - INTERVAL '3 days'),
+('Warga mengeluhkan banyaknya sampah di sekitar pasar tradisional yang mengganggu kebersihan dan kesehatan lingkungan.', 'Laporan Warga', 'https://example.com/laporan4', 'Warga Pasar', 'laporan', 'negatif', 6, 15, 'baru', NOW() - INTERVAL '5 days');
 
 -- ============================================================================
 -- ADDITIONAL TEST KEYWORDS

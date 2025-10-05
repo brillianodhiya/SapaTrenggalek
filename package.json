@@ -16,7 +16,10 @@
     "setup-instagram": "node setup-instagram-token.js",
     "test-instagram": "node test-instagram-token.js",
     "db-stats": "curl http://localhost:3000/api/admin/database-stats",
-    "test-cron": "curl -X POST http://localhost:3000/api/cron/scrape -H \"Authorization: Bearer b8fc9de2837daabb6a8f2ea3a8b2117cbe8683a5a78b046098dca41c18b01324\""
+    "test-cron": "curl -X POST http://localhost:3000/api/cron/scrape -H \"Authorization: Bearer b8fc9de2837daabb6a8f2ea3a8b2117cbe8683a5a78b046098dca41c18b01324\"",
+    "test-maintenance": "curl -X POST http://localhost:3000/api/cron/maintenance -H \"Authorization: Bearer b8fc9de2837daabb6a8f2ea3a8b2117cbe8683a5a78b046098dca41c18b01324\"",
+    "populate-test-data": "node scripts/populate-test-data.js",
+    "clear-test-data": "node scripts/clear-test-data.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",

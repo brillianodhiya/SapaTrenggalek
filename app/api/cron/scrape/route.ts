@@ -3,6 +3,7 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 import { scrapeAllSources } from "@/lib/simple-scraper";
 import { analyzeContent } from "@/lib/gemini";
 import { generateContentHash } from "@/lib/content-hash";
+import { updateEntryEmbedding } from "@/lib/embeddings";
 
 export const runtime = "nodejs";
 
@@ -105,11 +106,24 @@ export async function POST(request: NextRequest) {
           console.log(
             `✅ Saved: ${aiAnalysis.category} - ${aiAnalysis.sentiment}`
           );
+
+          // Generate embedding for the new entry
+          try {
+            console.log(`🔗 Generating embedding for entry ${data[0].id}...`);
+            await updateEntryEmbedding(data[0].id, item.content);
+            console.log(`✅ Embedding generated for entry ${data[0].id}`);
+          } catch (embeddingError) {
+            console.error(
+              `⚠️ Embedding generation failed for entry ${data[0].id}:`,
+              embeddingError
+            );
+            // Don't fail the whole process if embedding fails
+          }
         }
 
         // Add delay between AI calls to avoid rate limiting
         if (i < scrapedData.length - 1) {
-          await new Promise((resolve) => setTimeout(resolve, 2000));
+          await new Promise((resolve) => setTimeout(resolve, 2500)); // Slightly longer delay for embedding generation
         }
       } catch (error) {
         console.error(`❌ Error processing item ${i + 1}:`, error);

@@ -3,17 +3,15 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import AdminLayout from "@/components/AdminLayout";
 
-export default function AdminPage() {
+export default function AdminTrendsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/admin/login");
-    } else if (status === "authenticated") {
-      // Redirect to dashboard as the default admin page
-      router.push("/admin/dashboard");
     }
   }, [status, router]);
 
@@ -25,5 +23,18 @@ export default function AdminPage() {
     );
   }
 
-  return null;
+  if (!session) {
+    return null;
+  }
+
+  return (
+    <AdminLayout title="Tren & Isu Viral" activeTab="trends">
+      <div className="card">
+        <h2 className="text-xl font-bold mb-4">Tren & Isu Viral</h2>
+        <p className="text-gray-600">
+          Fitur ini akan menampilkan analisis tren dan isu yang sedang viral.
+        </p>
+      </div>
+    </AdminLayout>
+  );
 }

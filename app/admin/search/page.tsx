@@ -3,17 +3,16 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import VectorSearch from "@/components/VectorSearch";
+import AdminLayout from "@/components/AdminLayout";
 
-export default function AdminPage() {
+export default function AdminSearchPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/admin/login");
-    } else if (status === "authenticated") {
-      // Redirect to dashboard as the default admin page
-      router.push("/admin/dashboard");
     }
   }, [status, router]);
 
@@ -25,5 +24,15 @@ export default function AdminPage() {
     );
   }
 
-  return null;
+  if (!session) {
+    return null;
+  }
+
+  return (
+    <AdminLayout title="Vector Search" activeTab="search">
+      <div className="space-y-6">
+        <VectorSearch />
+      </div>
+    </AdminLayout>
+  );
 }

@@ -1,8 +1,8 @@
 # 🕒 Cronjob Setup Guide - Sapa Trenggalek
 
-## 🎯 **API Endpoint untuk Cronjob**
+## 🎯 **API Endpoints untuk Cronjob**
 
-### **Production Cronjob Endpoint:**
+### **1. Scraping Cronjob (Main):**
 
 ```
 POST /api/cron/scrape
@@ -12,6 +12,18 @@ POST /api/cron/scrape
 
 ```
 https://your-app.vercel.app/api/cron/scrape
+```
+
+### **2. Maintenance Cronjob (New):**
+
+```
+POST /api/cron/maintenance
+```
+
+**URL Lengkap:**
+
+```
+https://your-app.vercel.app/api/cron/maintenance
 ```
 
 ## 🔐 **Security & Authentication**
@@ -31,13 +43,11 @@ CRON_SECRET=b8fc9de2837daabb6a8f2ea3a8b2117cbe8683a5a78b046098dca41c18b01324
 
 ## 🚀 **GitHub Actions Setup (Recommended)**
 
-### **1. File Location:**
+### **1. Scraping Cronjob File:**
 
 ```
 .github/workflows/scraping-cron.yml
 ```
-
-### **2. Current Configuration:**
 
 ```yaml
 name: Scheduled Data Scraping
@@ -60,12 +70,40 @@ jobs:
             -d '{"source": "github-actions", "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}'
 ```
 
+### **2. Maintenance Cronjob File:**
+
+```
+.github/workflows/maintenance-cron.yml
+```
+
+```yaml
+name: Scheduled Maintenance
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: "0 2 * * *"
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  maintenance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Maintenance API
+        run: |
+          curl -X POST "${{ secrets.MAINTENANCE_ENDPOINT }}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            -d '{"source": "github-actions", "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}'
+```
+
 ### **3. GitHub Secrets Setup:**
 
 Di GitHub repository → Settings → Secrets and variables → Actions:
 
 ```
 SCRAPING_ENDPOINT = https://your-app.vercel.app/api/cron/scrape
+MAINTENANCE_ENDPOINT = https://your-app.vercel.app/api/cron/maintenance
 CRON_SECRET = b8fc9de2837daabb6a8f2ea3a8b2117cbe8683a5a78b046098dca41c18b01324
 ```
 
@@ -154,7 +192,7 @@ curl -X POST "https://your-app.vercel.app/api/cron/scrape" \
 
 ## 🔧 **Cronjob Features**
 
-### **What It Does:**
+### **Scraping Cronjob Features:**
 
 1. ✅ **Scrapes** data from Google News RSS + social media
 2. ✅ **AI Analysis** dengan Google Gemini 2.5 Flash
@@ -163,7 +201,16 @@ curl -X POST "https://your-app.vercel.app/api/cron/scrape" \
 5. ✅ **Hoax Detection** dengan probability scoring
 6. ✅ **Database Storage** ke Supabase
 7. ✅ **Similar Entry Grouping** untuk trend analysis
-8. ✅ **Rate Limiting** 2 detik delay antar AI calls
+8. ✅ **Auto Embedding Generation** untuk new entries
+9. ✅ **Rate Limiting** 2.5 detik delay antar AI calls
+
+### **Maintenance Cronjob Features:**
+
+1. ✅ **Embeddings Update** - Generate embeddings untuk entries tanpa embedding
+2. ✅ **Deduplication** - Remove duplicate entries berdasarkan similarity
+3. ✅ **Database Cleanup** - Remove old completed entries (>1 year)
+4. ✅ **Statistics Update** - Update embedding completion statistics
+5. ✅ **Batch Processing** - Process dalam batch untuk avoid timeout
 
 ### **Security Features:**
 
