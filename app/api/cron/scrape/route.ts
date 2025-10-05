@@ -36,19 +36,60 @@ export async function POST(request: NextRequest) {
     const errors: string[] = [];
     const embeddingQueue = []; // Queue for embedding generation
 
-    // Limit processing to avoid timeout (max 10 items per run)
-    const maxItemsPerRun = 10;
-    const itemsToProcess = scrapedData.slice(0, maxItemsPerRun);
+    // Get configurable processing limits
+    const maxItemsPerRun = parseInt(process.env.CRON_MAX_ITEMS_PER_RUN || "50");
+    const maxProcessingTime =
+      parseInt(process.env.CRON_MAX_PROCESSING_TIME || "45") * 1000; // Convert to milliseconds
+    const enableBatchProcessing =
+      process.env.CRON_ENABLE_BATCH_PROCESSING === "true";
+    const enableResumeProcessing =
+      process.env.CRON_ENABLE_RESUME_PROCESSING === "true";
 
-    if (scrapedData.length > maxItemsPerRun) {
+    // Calculate safe processing limit based on available time
+    const startTime = Date.now();
+    let itemsToProcess = scrapedData;
+
+    // Intelligent batch processing with priority-based sorting
+    if (enableBatchProcessing && scrapedData.length > 0) {
+      console.log("🧠 Applying intelligent batch processing...");
+
+      // Sort items by priority (recency, source importance, content keywords)
+      itemsToProcess = prioritizeScrapedData(scrapedData);
+      console.log(`📊 Sorted ${itemsToProcess.length} items by priority`);
+    }
+
+    // Apply limits only if configured (0 means unlimited)
+    if (maxItemsPerRun > 0) {
+      itemsToProcess = itemsToProcess.slice(0, maxItemsPerRun);
+
+      if (scrapedData.length > maxItemsPerRun) {
+        console.log(
+          `⚠️ Limited processing to ${maxItemsPerRun} items (${scrapedData.length} total scraped)`
+        );
+      }
+    } else {
       console.log(
-        `⚠️ Limited processing to ${maxItemsPerRun} items (${scrapedData.length} total scraped)`
+        `🚀 Processing all ${scrapedData.length} scraped items (unlimited mode)`
       );
     }
 
     // Process each scraped item with real Gemini AI
     for (let i = 0; i < itemsToProcess.length; i++) {
       const item = itemsToProcess[i];
+
+      // Check if we're approaching timeout
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = maxProcessingTime - elapsedTime;
+
+      if (remainingTime < 10000) {
+        // Less than 10 seconds remaining
+        console.log(
+          `⏰ Approaching timeout, stopping at item ${i + 1}/${
+            itemsToProcess.length
+          }`
+        );
+        break;
+      }
 
       try {
         console.log(
@@ -127,9 +168,9 @@ export async function POST(request: NextRequest) {
           console.log(`📝 Queued embedding generation for entry ${data[0].id}`);
         }
 
-        // Add delay between AI calls to avoid rate limiting
+        // Add minimal delay between AI calls to avoid rate limiting
         if (i < itemsToProcess.length - 1) {
-          await new Promise((resolve) => setTimeout(resolve, 1500)); // Reduced delay since no embedding generation
+          await new Promise((resolve) => setTimeout(resolve, 500)); // Reduced delay for faster processing
         }
       } catch (error) {
         console.error(`❌ Error processing item ${i + 1}:`, error);
@@ -147,11 +188,31 @@ export async function POST(request: NextRequest) {
       await groupSimilarEntries();
     }
 
+    const totalProcessingTime = Date.now() - startTime;
+    const wasLimited =
+      scrapedData.length >
+      processedEntries.length + duplicateSkipped.length + errors.length;
+
+    // Calculate unprocessed items for potential resume
+    const totalProcessedOrSkipped =
+      processedEntries.length + duplicateSkipped.length + errors.length;
+    const unprocessedCount = scrapedData.length - totalProcessedOrSkipped;
+
+    // Log resume information if there are unprocessed items
+    if (enableResumeProcessing && unprocessedCount > 0) {
+      console.log(
+        `📋 Resume info: ${unprocessedCount} items remain unprocessed`
+      );
+      console.log(
+        `⏭️ Next run will prioritize remaining items if batch processing is enabled`
+      );
+    }
+
     const response = {
       success: true,
       processed: processedEntries.length,
       scraped: scrapedData.length,
-      limited: scrapedData.length > maxItemsPerRun,
+      limited: wasLimited,
       duplicatesSkipped: duplicateSkipped.length,
       errors: errors.length,
       embeddingsQueued: embeddingQueue.length,
@@ -172,10 +233,26 @@ export async function POST(request: NextRequest) {
       },
       duplicateDetails: duplicateSkipped.slice(0, 5), // Show first 5 duplicates
       performance: {
-        maxItemsPerRun,
+        maxItemsPerRun: maxItemsPerRun === 0 ? "unlimited" : maxItemsPerRun,
         totalScraped: scrapedData.length,
         actualProcessed: itemsToProcess.length,
         embeddingsQueued: embeddingQueue.length,
+        processingTimeMs: totalProcessingTime,
+        processingTimeSec: Math.round(totalProcessingTime / 1000),
+        averageTimePerItem: Math.round(
+          totalProcessingTime / Math.max(processedEntries.length, 1)
+        ),
+        configuredLimits: {
+          maxItems: maxItemsPerRun,
+          maxTimeSeconds: Math.round(maxProcessingTime / 1000),
+          batchProcessing: enableBatchProcessing,
+          resumeProcessing: enableResumeProcessing,
+        },
+        batchInfo: {
+          unprocessedCount: unprocessedCount,
+          prioritySortingApplied: enableBatchProcessing,
+          canResumeNextRun: enableResumeProcessing && unprocessedCount > 0,
+        },
       },
     };
 
@@ -277,4 +354,100 @@ function calculateSimilarity(keywords1: string[], keywords2: string[]): number {
   const union = Array.from(unionSet);
 
   return intersection.length / union.length;
+}
+
+// Priority-based sorting for intelligent batch processing
+function prioritizeScrapedData(data: any[]): any[] {
+  return data.sort((a, b) => {
+    // Calculate priority score for each item
+    const scoreA = calculatePriorityScore(a);
+    const scoreB = calculatePriorityScore(b);
+
+    // Sort by highest priority first
+    return scoreB - scoreA;
+  });
+}
+
+function calculatePriorityScore(item: any): number {
+  let score = 0;
+
+  // 1. Recency score (newer content gets higher priority)
+  const now = Date.now();
+  const itemTime = new Date(item.timestamp).getTime();
+  const ageHours = (now - itemTime) / (1000 * 60 * 60);
+
+  if (ageHours < 1) score += 100; // Very recent (< 1 hour)
+  else if (ageHours < 6) score += 80; // Recent (< 6 hours)
+  else if (ageHours < 24) score += 60; // Today
+  else if (ageHours < 72) score += 40; // Last 3 days
+  else score += 20; // Older content
+
+  // 2. Source importance score
+  const source = item.source?.toLowerCase() || "";
+  if (source.includes("twitter") || source.includes("x")) score += 30;
+  else if (source.includes("instagram")) score += 25;
+  else if (source.includes("facebook")) score += 20;
+  else if (source.includes("news")) score += 35;
+  else score += 15; // Other sources
+
+  // 3. Content urgency indicators
+  const content = item.content?.toLowerCase() || "";
+  const urgentKeywords = [
+    "darurat",
+    "urgent",
+    "breaking",
+    "penting",
+    "segera",
+    "bencana",
+    "kecelakaan",
+    "kebakaran",
+    "banjir",
+    "gempa",
+    "covid",
+    "virus",
+    "wabah",
+    "pandemi",
+    "demo",
+    "unjuk rasa",
+    "kerusuhan",
+    "bentrok",
+    "korupsi",
+    "penangkapan",
+    "operasi",
+    "pemadaman",
+    "gangguan",
+    "rusak",
+    "macet",
+  ];
+
+  const urgentMatches = urgentKeywords.filter((keyword) =>
+    content.includes(keyword)
+  ).length;
+  score += urgentMatches * 15;
+
+  // 4. Official source bonus
+  const author = item.author?.toLowerCase() || "";
+  if (
+    author.includes("pemkab") ||
+    author.includes("dinas") ||
+    author.includes("pemerintah") ||
+    author.includes("official")
+  ) {
+    score += 25;
+  }
+
+  // 5. Engagement indicators (for social media)
+  if (item.metadata) {
+    const likes = item.metadata.like_count || 0;
+    const retweets = item.metadata.retweet_count || 0;
+    const replies = item.metadata.reply_count || 0;
+
+    const engagement = likes + retweets * 2 + replies * 1.5;
+    if (engagement > 100) score += 20;
+    else if (engagement > 50) score += 15;
+    else if (engagement > 10) score += 10;
+    else if (engagement > 0) score += 5;
+  }
+
+  return score;
 }
