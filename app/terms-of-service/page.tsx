@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "Ketentuan Layanan - Sapa Trenggalek",
@@ -219,6 +220,7 @@ export default function TermsOfServicePage() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

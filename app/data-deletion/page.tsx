@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "Penghapusan Data Pengguna - Sapa Trenggalek",
@@ -294,6 +295,7 @@ export default function DataDeletionPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
