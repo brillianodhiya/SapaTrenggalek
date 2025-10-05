@@ -268,6 +268,12 @@ export async function POST(request: NextRequest) {
       processEmbeddingsAsync(embeddingQueue);
     }
 
+    // Trigger trends analysis if we processed new entries
+    if (processedEntries.length > 0) {
+      console.log("📊 Triggering trends analysis...");
+      triggerTrendsAnalysis();
+    }
+
     return NextResponse.json(response);
   } catch (error) {
     console.error("❌ Cron job failed:", error);
@@ -304,6 +310,33 @@ async function processEmbeddingsAsync(
   }
 
   console.log(`🎉 Async embedding generation completed`);
+}
+
+async function triggerTrendsAnalysis() {
+  try {
+    console.log("📊 Triggering trends analysis...");
+
+    const response = await fetch(
+      `${process.env.NEXTAUTH_URL}/api/cron/analyze-trends`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.CRON_SECRET}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log("✅ Trends analysis triggered successfully:", result.message);
+    } else {
+      console.error("❌ Failed to trigger trends analysis:", response.status);
+    }
+  } catch (error) {
+    console.error("❌ Error triggering trends analysis:", error);
+    // Don't throw error, just log it
+  }
 }
 
 async function groupSimilarEntries() {

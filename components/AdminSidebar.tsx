@@ -57,7 +57,7 @@ export default function AdminSidebar({ activeTab }: AdminSidebarProps) {
       id: "urgent",
       label: "Item Mendesak",
       icon: AlertTriangle,
-      href: "/admin/urgent",
+      href: "/admin/urgent-items",
     },
     {
       id: "trends",

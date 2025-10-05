@@ -1,0 +1,220 @@
+{
+  "trending_keywords": [
+    {
+      "keyword": "Trenggalek",
+      "total_mentions": 39,
+      "growth_rate": -47.16582795872948,
+      "momentum": "rising",
+      "positive_ratio": 0,
+      "negative_ratio": 0,
+      "neutral_ratio": 0,
+      "sources": {
+        "unknown": 39
+      },
+      "latest_mentions": 11
+    },
+    {
+      "keyword": "Hiu Paus",
+      "total_mentions": 6,
+      "growth_rate": 67.47285227083401,
+      "momentum": "stable",
+      "positive_ratio": 0,
+      "negative_ratio": 0,
+      "neutral_ratio": 0,
+      "sources": {
+        "unknown": 6
+      },
+      "latest_mentions": 1
+    },
+    {
+      "keyword": "Terdampar",
+      "total_mentions": 6,
+      "growth_rate": 81.94082352534639,
+      "momentum": "stable",
+      "positive_ratio": 0,
+      "negative_ratio": 0,
+      "neutral_ratio": 0,
+      "sources": {
+        "unknown": 6
+      },
+      "latest_mentions": 1
+    },
+    {
+      "keyword": "Pantai Cengkrong",
+      "total_mentions": 5,
+      "growth_rate": 96.97140479705567,
+      "momentum": "declining",
+      "positive_ratio": 0,
+      "negative_ratio": 0,
+      "neutral_ratio": 0,
+      "sources": {
+        "unknown": 5
+      },
+      "latest_mentions": 1
+    },
+    {
+      "keyword": "Bupati Trenggalek",
+      "total_mentions": 4,
+      "growth_rate": 99.79261562758731,
+      "momentum": "declining",
+      "positive_ratio": 0,
+      "negative_ratio": 0,
+      "neutral_ratio": 0,
+      "sources": {
+        "unknown": 4
+      },
+      "latest_mentions": 1
+    },
+    {
+      "keyword": "Festival Jaranan",
+      "total_mentions": 4,
+      "growth_rate": 37.17166001150281,
+      "momentum": "declining",
+      "positive_ratio": 0,
+      "negative_ratio": 0,
+      "neutral_ratio": 0,
+      "sources": {
+        "unknown": 4
+      },
+      "latest_mentions": 1
+    },
+    {
+      "keyword": "2025",
+      "total_mentions": 3,
+      "growth_rate": -4.3224831695392965,
+      "momentum": "declining",
+      "positive_ratio": 0,
+      "negative_ratio": 0,
+      "neutral_ratio": 0,
+      "sources": {
+        "unknown": 3
+      },
+      "latest_mentions": 0
+    },
+    {
+      "keyword": "MGEI",
+      "total_mentions": 3,
+      "growth_rate": 141.69067449362655,
+      "momentum": "declining",
+      "positive_ratio": 0,
+      "negative_ratio": 0,
+      "neutral_ratio": 0,
+      "sources": {
+        "unknown": 3
+      },
+      "latest_mentions": 0
+    },
+    {
+      "keyword": "Nelayan",
+      "total_mentions": 3,
+      "growth_rate": 81.41819006917208,
+      "momentum": "declining",
+      "positive_ratio": 0,
+      "negative_ratio": 0,
+      "neutral_ratio": 0,
+      "sources": {
+        "unknown": 3
+      },
+      "latest_mentions": 0
+    }
+  ],
+  "emerging_issues": [
+    {
+      "title": "Infrastruktur Jalan Rusak",
+      "keywords": [
+        "jalan",
+        "rusak",
+        "infrastruktur",
+        "perbaikan"
+      ],
+      "velocity": 150.5,
+      "urgency_score": 8,
+      "mention_count": 25,
+      "first_mention": "2025-10-05T08:46:15.222Z"
+    },
+    {
+      "title": "Pelayanan Kesehatan",
+      "keywords": [
+        "kesehatan",
+        "pelayanan",
+        "rumah sakit",
+        "dokter"
+      ],
+      "velocity": 89.2,
+      "urgency_score": 6,
+      "mention_count": 18,
+      "first_mention": "2025-10-05T02:46:15.222Z"
+    },
+    {
+      "title": "Pendidikan Online",
+      "keywords": [
+        "pendidikan",
+        "sekolah",
+        "online",
+        "siswa"
+      ],
+      "velocity": 67.8,
+      "urgency_score": 4,
+      "mention_count": 12,
+      "first_mention": "2025-10-04T14:46:15.222Z"
+    }
+  ],
+  "keyword_cloud": [
+    {
+      "text": "Trenggalek",
+      "weight": 39,
+      "sentiment": "neutral",
+      "category": "general"
+    },
+    {
+      "text": "Hiu Paus",
+      "weight": 6,
+      "sentiment": "neutral",
+      "category": "general"
+    },
+    {
+      "text": "Terdampar",
+      "weight": 6,
+      "sentiment": "neutral",
+      "category": "general"
+    },
+    {
+      "text": "Pantai Cengkrong",
+      "weight": 5,
+      "sentiment": "neutral",
+      "category": "general"
+    },
+    {
+      "text": "Bupati Trenggalek",
+      "weight": 4,
+      "sentiment": "neutral",
+      "category": "general"
+    },
+    {
+      "text": "Festival Jaranan",
+      "weight": 4,
+      "sentiment": "neutral",
+      "category": "general"
+    },
+    {
+      "text": "2025",
+      "weight": 3,
+      "sentiment": "neutral",
+      "category": "general"
+    },
+    {
+      "text": "MGEI",
+      "weight": 3,
+      "sentiment": "neutral",
+      "category": "general"
+    },
+    {
+      "text": "Nelayan",
+      "weight": 3,
+      "sentiment": "neutral",
+      "category": "general"
+    }
+  ],
+  "generated_at": "2025-10-05T14:46:15.223Z",
+  "data_source": "analysis_of_existing_entries"
+}
