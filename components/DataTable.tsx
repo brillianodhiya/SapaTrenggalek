@@ -9,6 +9,7 @@ import {
   ExternalLink,
   AlertTriangle,
 } from "lucide-react";
+import ManualEntryForm from "./ManualEntryForm";
 
 interface DataEntry {
   id: string;
@@ -127,8 +128,18 @@ export default function DataTable({ onStatusUpdate }: DataTableProps) {
     }
   };
 
+  const handleEntryAdded = () => {
+    fetchEntries(); // Refresh data after new entry
+  };
+
   return (
     <div className="space-y-6">
+      {/* Header with Add Button */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold text-gray-900">Data Monitoring</h2>
+        <ManualEntryForm onEntryAdded={handleEntryAdded} />
+      </div>
+
       {/* Filters */}
       <div className="card">
         <div className="flex flex-col md:flex-row gap-4">

@@ -1,8 +1,42 @@
 # 🗄️ Database Management Guide - Sapa Trenggalek
 
-## ✅ **MASALAH SOLVED: Database Cleanup**
+## 📁 **SQL Files Structure (Cleaned Up)**
 
-Database sudah berhasil dibersihkan dari **113 entries** menjadi **16 entries** yang relevan.
+Struktur SQL sudah dibersihkan dari 15 file menjadi 3 file utama:
+
+### **Core Files:**
+
+- `sql/schema.sql` - **Complete database schema** (all-in-one)
+- `sql/migrations.sql` - **Database migrations** (for existing databases)
+- `sql/test-data.sql` - **Test data** (for development)
+
+### **What's Included in schema.sql:**
+
+- ✅ Extensions (UUID, Vector)
+- ✅ All tables with vector support
+- ✅ Indexes and functions
+- ✅ Security policies (RLS)
+- ✅ Sample keywords and settings
+
+## 🚀 **Database Setup**
+
+### **Fresh Installation:**
+
+1. Run `sql/schema.sql` in Supabase SQL Editor
+2. Optionally run `sql/test-data.sql` for sample data
+3. Done! Everything is configured.
+
+### **Existing Database Update:**
+
+1. Run `sql/migrations.sql` to update existing database
+2. This will add missing columns, indexes, and functions
+3. Safe to run multiple times (idempotent)
+
+### **Development Setup:**
+
+1. Run `sql/schema.sql` for complete setup
+2. Run `sql/test-data.sql` for realistic test data
+3. Use admin interface for further management
 
 ## 🛠️ **Database Management Tools**
 

@@ -9,6 +9,11 @@ import DataTable from "@/components/DataTable";
 import DatabaseManager from "@/components/DatabaseManager";
 import VectorSearch from "@/components/VectorSearch";
 import EmbeddingManager from "@/components/EmbeddingManager";
+import DeduplicationManager from "@/components/DeduplicationManager";
+import Analytics from "@/components/Analytics";
+import TwitterManager from "@/components/TwitterManager";
+import InstagramManager from "@/components/InstagramManager";
+import FacebookManager from "@/components/FacebookManager";
 import { LogOut, User } from "lucide-react";
 
 export default function AdminPage() {
@@ -45,7 +50,7 @@ export default function AdminPage() {
       case "data":
         return <DataTable />;
       case "analytics":
-        return <Dashboard />;
+        return <Analytics />;
       case "urgent":
         return (
           <div className="card">
@@ -77,6 +82,30 @@ export default function AdminPage() {
             <EmbeddingManager />
           </div>
         );
+      case "deduplication":
+        return (
+          <div className="space-y-6">
+            <DeduplicationManager />
+          </div>
+        );
+      case "twitter":
+        return (
+          <div className="space-y-6">
+            <TwitterManager />
+          </div>
+        );
+      case "instagram":
+        return (
+          <div className="space-y-6">
+            <InstagramManager />
+          </div>
+        );
+      case "facebook":
+        return (
+          <div className="space-y-6">
+            <FacebookManager />
+          </div>
+        );
       case "settings":
         return (
           <div className="space-y-6">
@@ -98,12 +127,13 @@ export default function AdminPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Interval Scraping (jam)
                   </label>
-                  <select className="w-full p-3 border border-gray-300 rounded-lg">
+                  <select
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    defaultValue="6"
+                  >
                     <option value="1">Setiap 1 jam</option>
                     <option value="3">Setiap 3 jam</option>
-                    <option value="6" selected>
-                      Setiap 6 jam
-                    </option>
+                    <option value="6">Setiap 6 jam</option>
                     <option value="12">Setiap 12 jam</option>
                     <option value="24">Setiap 24 jam</option>
                   </select>
@@ -134,6 +164,10 @@ export default function AdminPage() {
                 {activeTab === "analytics" && "Analitik & Laporan"}
                 {activeTab === "urgent" && "Item Mendesak"}
                 {activeTab === "trends" && "Tren & Isu Viral"}
+                {activeTab === "deduplication" && "Deduplication Manager"}
+                {activeTab === "twitter" && "Twitter/X Manager"}
+                {activeTab === "instagram" && "Instagram Manager"}
+                {activeTab === "facebook" && "Facebook Manager"}
                 {activeTab === "settings" && "Pengaturan Sistem"}
               </h1>
             </div>

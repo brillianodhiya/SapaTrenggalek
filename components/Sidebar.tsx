@@ -12,6 +12,10 @@ import {
   TrendingUp,
   Search,
   Zap,
+  Trash2,
+  Twitter,
+  Instagram,
+  Facebook,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -30,6 +34,10 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
     { id: "urgent", label: "Item Mendesak", icon: AlertTriangle },
     { id: "trends", label: "Tren & Isu", icon: TrendingUp },
     { id: "embeddings", label: "Embeddings", icon: Zap },
+    { id: "deduplication", label: "Deduplication", icon: Trash2 },
+    { id: "twitter", label: "Twitter/X", icon: Twitter },
+    { id: "instagram", label: "Instagram", icon: Instagram },
+    { id: "facebook", label: "Facebook", icon: Facebook },
     { id: "settings", label: "Pengaturan", icon: Settings },
   ];
 

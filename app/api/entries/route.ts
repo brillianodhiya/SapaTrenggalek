@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { generateContentHash } from "@/lib/content-hash";
 
 export const runtime = "nodejs";
 
@@ -69,6 +70,103 @@ export async function GET(request: NextRequest) {
     // Return demo data instead of error
     return NextResponse.json(
       getDemoEntries(page, limit, category, status, search)
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const { content, source, author, category } = await request.json();
+
+    if (!content || !source) {
+      return NextResponse.json(
+        { error: "Content and source are required" },
+        { status: 400 }
+      );
+    }
+
+    // Check if Supabase is configured
+    if (
+      !process.env.SUPABASE_SERVICE_ROLE_KEY ||
+      !process.env.NEXT_PUBLIC_SUPABASE_URL
+    ) {
+      console.log("Supabase not configured, simulating entry creation");
+      return NextResponse.json({
+        data: {
+          id: Date.now().toString(),
+          content,
+          source,
+          author: author || "Unknown",
+          category: category || "lainnya",
+          created_at: new Date().toISOString(),
+        },
+      });
+    }
+
+    // Generate content hash for duplicate detection
+    const contentHash = generateContentHash(content);
+
+    // Check if content already exists
+    const { data: existingEntry, error: checkError } = await supabaseAdmin
+      .from("data_entries")
+      .select("id, content, created_at")
+      .eq("content_hash", contentHash)
+      .limit(1);
+
+    if (checkError) {
+      console.error("Error checking duplicates:", checkError);
+      return NextResponse.json(
+        { error: "Error checking duplicates" },
+        { status: 500 }
+      );
+    }
+
+    if (existingEntry && existingEntry.length > 0) {
+      return NextResponse.json(
+        {
+          error: "Duplicate content detected",
+          duplicate: {
+            id: existingEntry[0].id,
+            created_at: existingEntry[0].created_at,
+            content_preview: existingEntry[0].content.substring(0, 100) + "...",
+          },
+        },
+        { status: 409 }
+      );
+    }
+
+    // Create new entry
+    const entry = {
+      content,
+      source,
+      author: author || "Unknown",
+      category: category || "lainnya",
+      sentiment: "netral",
+      urgency_level: 5,
+      hoax_probability: 0,
+      status: "baru",
+      processed_by_ai: false,
+      content_hash: contentHash,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    const { data, error } = await supabaseAdmin
+      .from("data_entries")
+      .insert(entry)
+      .select();
+
+    if (error) {
+      console.error("Error creating entry:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ data: data[0] });
+  } catch (error) {
+    console.error("POST entries error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
     );
   }
 }

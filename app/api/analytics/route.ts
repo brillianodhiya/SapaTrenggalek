@@ -88,13 +88,38 @@ export async function GET() {
       return acc;
     }, {} as Record<string, any>);
 
+    // Get source distribution
+    const { data: sourceData } = await supabaseAdmin
+      .from("data_entries")
+      .select("source");
+
+    const sourceStats =
+      sourceData?.reduce((acc, item) => {
+        acc[item.source] = (acc[item.source] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>) || {};
+
+    // Convert to top sources array
+    const topSources = Object.entries(sourceStats)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 5)
+      .map(([source, count]) => ({ source, count }));
+
+    // Convert daily trends to simple format
+    const dailyTrendsArray = Object.values(trendData || {}).map((day: any) => ({
+      date: day.date,
+      count: day.berita + day.laporan + day.aspirasi + day.lainnya,
+    }));
+
     return NextResponse.json({
-      categoryStats: categoryStats || {},
-      statusStats: statusStats || {},
-      sentimentStats: sentimentStats || {},
-      urgentItems: urgentItems || [],
-      hoaxItems: hoaxItems || [],
-      dailyTrends: Object.values(trendData || {}),
+      totalEntries: categoryData?.length || 0,
+      categoriesBreakdown: categoryStats || {},
+      sentimentBreakdown: sentimentStats || {},
+      urgentItems: urgentItems?.length || 0,
+      hoaxItems: hoaxItems?.length || 0,
+      statusBreakdown: statusStats || {},
+      dailyTrends: dailyTrendsArray,
+      topSources: topSources,
     });
   } catch (error) {
     console.error("Analytics error:", error);
@@ -105,58 +130,63 @@ export async function GET() {
 
 function getDemoAnalytics() {
   return {
+    totalEntries: 156,
+    categoriesBreakdown: {
+      berita: 45,
+      laporan: 38,
+      aspirasi: 32,
+      pengaduan: 28,
+      lainnya: 13,
+    },
+    sentimentBreakdown: {
+      positif: 62,
+      netral: 71,
+      negatif: 23,
+    },
+    urgentItems: 12,
+    hoaxItems: 8,
+    statusBreakdown: {
+      baru: 34,
+      diverifikasi: 45,
+      diteruskan: 38,
+      dikerjakan: 25,
+      selesai: 14,
+    },
+    dailyTrends: [
+      { date: "2024-01-01", count: 12 },
+      { date: "2024-01-02", count: 18 },
+      { date: "2024-01-03", count: 15 },
+      { date: "2024-01-04", count: 22 },
+      { date: "2024-01-05", count: 19 },
+      { date: "2024-01-06", count: 25 },
+      { date: "2024-01-07", count: 21 },
+    ],
+    topSources: [
+      { source: "WhatsApp", count: 45 },
+      { source: "Facebook", count: 32 },
+      { source: "Website Resmi", count: 28 },
+      { source: "Instagram", count: 24 },
+      { source: "Twitter", count: 18 },
+    ],
+    // Legacy format for Dashboard compatibility
     categoryStats: {
       berita: 45,
-      laporan: 23,
-      aspirasi: 18,
-      lainnya: 12,
+      laporan: 38,
+      aspirasi: 32,
+      pengaduan: 28,
+      lainnya: 13,
     },
     statusStats: {
-      baru: 32,
-      diproses: 28,
-      selesai: 38,
+      baru: 34,
+      diverifikasi: 45,
+      diteruskan: 38,
+      dikerjakan: 25,
+      selesai: 14,
     },
     sentimentStats: {
-      positif: 42,
-      netral: 35,
-      negatif: 21,
+      positif: 62,
+      netral: 71,
+      negatif: 23,
     },
-    urgentItems: [
-      {
-        id: 1,
-        content:
-          "Laporan kerusakan jalan utama di Kecamatan Trenggalek yang mengganggu aktivitas warga",
-        urgency_level: 9,
-        source: "WhatsApp",
-        created_at: new Date().toISOString(),
-      },
-      {
-        id: 2,
-        content:
-          "Keluhan masyarakat tentang pelayanan administrasi yang lambat di kantor desa",
-        urgency_level: 8,
-        source: "Website",
-        created_at: new Date().toISOString(),
-      },
-    ],
-    hoaxItems: [
-      {
-        id: 3,
-        content:
-          "Informasi tidak akurat tentang program bantuan pemerintah yang beredar di media sosial",
-        hoax_probability: 85,
-        source: "Facebook",
-        created_at: new Date().toISOString(),
-      },
-    ],
-    dailyTrends: [
-      { date: "2024-01-01", berita: 5, laporan: 3, aspirasi: 2, lainnya: 1 },
-      { date: "2024-01-02", berita: 7, laporan: 4, aspirasi: 3, lainnya: 2 },
-      { date: "2024-01-03", berita: 6, laporan: 5, aspirasi: 4, lainnya: 1 },
-      { date: "2024-01-04", berita: 8, laporan: 2, aspirasi: 3, lainnya: 2 },
-      { date: "2024-01-05", berita: 9, laporan: 6, aspirasi: 2, lainnya: 1 },
-      { date: "2024-01-06", berita: 5, laporan: 3, aspirasi: 5, lainnya: 3 },
-      { date: "2024-01-07", berita: 5, laporan: 0, aspirasi: 2, lainnya: 2 },
-    ],
   };
 }

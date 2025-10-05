@@ -34,6 +34,14 @@ npm install
    - Copy semua isi dari `sql/schema.sql`
    - Paste dan klik **Run**
 
+   **Note**: File `schema.sql` sudah include semua yang diperlukan:
+
+   - Extensions (UUID, Vector)
+   - Tables dengan vector support
+   - Indexes dan functions
+   - Security policies
+   - Sample data
+
 3. **Dapatkan API Keys**:
    - Buka **Settings** → **API**
    - Copy:
@@ -47,7 +55,43 @@ npm install
 2. Klik "Create API Key"
 3. Copy API key yang dihasilkan
 
-### 4. Generate Secrets
+### 4. Setup Instagram API (Optional)
+
+Instagram integration menggunakan Official API untuk monitoring media sosial.
+
+**Requirements:**
+
+- Facebook Developer Account
+- Instagram account (personal atau business)
+
+**Quick Setup:**
+
+1. Buat Facebook App di [developers.facebook.com](https://developers.facebook.com)
+2. Tambahkan produk "Instagram Basic Display"
+3. Configure OAuth redirect URLs
+4. Generate access token melalui OAuth flow
+
+> **Detailed Guide**: Lihat [Instagram Integration Guide](INSTAGRAM-INTEGRATION.md) untuk setup lengkap dan troubleshooting.
+
+### 5. Setup Facebook API (Optional)
+
+Facebook integration menggunakan Graph API untuk monitoring halaman Facebook.
+
+**Requirements:**
+
+- Facebook Developer Account
+- Access ke Facebook pages yang ingin dimonitor
+
+**Quick Setup:**
+
+1. Buat Facebook App di [developers.facebook.com](https://developers.facebook.com)
+2. Tambahkan produk "Graph API"
+3. Request permissions: `pages_read_engagement`
+4. Generate access token via Graph API Explorer
+
+> **Detailed Guide**: Lihat [Facebook Integration Guide](FACEBOOK-INTEGRATION.md) untuk setup lengkap dan troubleshooting.
+
+### 6. Generate Secrets
 
 ```bash
 npm run generate-secrets
@@ -67,6 +111,13 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
 
 # Google Gemini AI
 GEMINI_API_KEY=your_gemini_api_key_here
+
+# Instagram Official API (Optional)
+INSTAGRAM_ACCESS_TOKEN=your_instagram_access_token
+INSTAGRAM_SECRET_KEY=your_instagram_app_secret
+
+# Facebook Official API (Optional)
+FACEBOOK_ACCESS_TOKEN=your_facebook_access_token
 
 # Generated Secrets
 CRON_SECRET=generated_cron_secret
@@ -149,8 +200,9 @@ curl -X POST http://localhost:3000/api/test-scraping
 **Solusi**:
 
 1. Pastikan Supabase project sudah dibuat
-2. Jalankan SQL schema dari `sql/schema.sql`
-3. Periksa environment variables
+2. Jalankan SQL schema dari `sql/schema.sql` (complete setup)
+3. Jika update dari database lama, jalankan `sql/migrations.sql`
+4. Periksa environment variables
 
 ### AI Analysis Error
 

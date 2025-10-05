@@ -7,6 +7,12 @@ export interface ScrapedData {
   timestamp: Date;
 }
 
+import { TwitterScraper, type TwitterScrapedData } from "./twitter-scraper";
+import {
+  InstagramScraper,
+  type InstagramScrapedData,
+} from "./instagram-scraper";
+
 // Keywords untuk monitoring
 const MONITORING_KEYWORDS = [
   "trenggalek",
@@ -154,11 +160,118 @@ export async function scrapeSocialMedia(): Promise<ScrapedData[]> {
   ];
 }
 
+// Convert TwitterScrapedData to ScrapedData format
+function convertTwitterData(twitterData: TwitterScrapedData[]): ScrapedData[] {
+  return twitterData.map((tweet) => ({
+    content: tweet.content,
+    source: tweet.source,
+    source_url: tweet.source_url,
+    author: tweet.author,
+    timestamp: tweet.timestamp,
+  }));
+}
+
+// Convert InstagramScrapedData to ScrapedData format
+function convertInstagramData(
+  instagramData: InstagramScrapedData[]
+): ScrapedData[] {
+  return instagramData.map((post) => ({
+    content: post.content,
+    source: post.source,
+    source_url: post.source_url,
+    author: post.author,
+    timestamp: post.timestamp,
+  }));
+}
+
+export async function scrapeTwitterData(): Promise<ScrapedData[]> {
+  try {
+    console.log("🐦 Starting Twitter scraping...");
+
+    const twitterScraper = new TwitterScraper();
+
+    // Scrape recent tweets about Trenggalek
+    const recentTweets = await twitterScraper.scrapeRecentTweets(30);
+
+    // Also scrape from official accounts if configured
+    const officialAccounts = [
+      "pemkabtrenggalek", // Official Pemkab account (if exists)
+      "humas_trenggalek", // Official Humas account (if exists)
+    ];
+
+    const timelineTweets: TwitterScrapedData[] = [];
+    for (const account of officialAccounts) {
+      try {
+        const tweets = await twitterScraper.scrapeUserTimeline(account, 10);
+        timelineTweets.push(...tweets);
+      } catch (error) {
+        console.log(`⚠️ Could not scrape @${account}, might not exist`);
+      }
+    }
+
+    const allTwitterData = [...recentTweets, ...timelineTweets];
+    console.log(
+      `✅ Twitter scraping completed: ${allTwitterData.length} tweets`
+    );
+
+    return convertTwitterData(allTwitterData);
+  } catch (error) {
+    console.error("❌ Twitter scraping failed:", error);
+    return [];
+  }
+}
+
+export async function scrapeInstagramData(): Promise<ScrapedData[]> {
+  try {
+    console.log("📸 Starting Instagram scraping...");
+
+    const instagramScraper = new InstagramScraper();
+
+    // Official Instagram accounts to scrape
+    const officialAccounts = [
+      "pemkabtrenggalek", // Official Pemkab account
+      "humas_trenggalek", // Official Humas account
+      "dispar_trenggalek", // Tourism department
+      "trenggalekhits", // Popular local account
+      "exploretrenggalek", // Tourism/exploration account
+      "kuliner_trenggalek", // Food/culinary account
+    ];
+
+    // Use the new scrapeAll method for comprehensive scraping
+    const allInstagramData = await instagramScraper.scrapeAll();
+
+    console.log(
+      `✅ Instagram scraping completed: ${allInstagramData.length} posts`
+    );
+
+    return convertInstagramData(allInstagramData);
+  } catch (error) {
+    console.error("❌ Instagram scraping failed:", error);
+    return [];
+  }
+}
+
 export async function scrapeAllSources(): Promise<ScrapedData[]> {
-  const [newsData, socialData] = await Promise.all([
+  console.log("🚀 Starting comprehensive scraping from all sources...");
+
+  const [newsData, socialData, twitterData, instagramData] = await Promise.all([
     scrapeNewsData(),
     scrapeSocialMedia(),
+    scrapeTwitterData(),
+    scrapeInstagramData(),
   ]);
 
-  return [...newsData, ...socialData];
+  const totalResults =
+    newsData.length +
+    socialData.length +
+    twitterData.length +
+    instagramData.length;
+  console.log(`📊 Scraping summary:
+    - News: ${newsData.length} items
+    - Social Media: ${socialData.length} items  
+    - Twitter: ${twitterData.length} items
+    - Instagram: ${instagramData.length} items
+    - Total: ${totalResults} items`);
+
+  return [...newsData, ...socialData, ...twitterData, ...instagramData];
 }

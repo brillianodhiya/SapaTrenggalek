@@ -25,12 +25,18 @@ import {
 } from "lucide-react";
 
 interface AnalyticsData {
-  categoryStats: Record<string, number>;
-  statusStats: Record<string, number>;
-  sentimentStats: Record<string, number>;
-  urgentItems: any[];
-  hoaxItems: any[];
+  totalEntries: number;
+  categoriesBreakdown: Record<string, number>;
+  statusBreakdown: Record<string, number>;
+  sentimentBreakdown: Record<string, number>;
+  urgentItems: number | any[];
+  hoaxItems: number | any[];
   dailyTrends: any[];
+  topSources: any[];
+  // Legacy support for old format
+  categoryStats?: Record<string, number>;
+  statusStats?: Record<string, number>;
+  sentimentStats?: Record<string, number>;
 }
 
 const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
@@ -71,26 +77,36 @@ export default function Dashboard() {
     );
   }
 
-  const categoryData = Object.entries(analytics.categoryStats).map(
-    ([key, value]) => ({
-      name: key.charAt(0).toUpperCase() + key.slice(1),
-      value,
-    })
-  );
+  // Support both old and new API format
+  const categories =
+    analytics.categoriesBreakdown || analytics.categoryStats || {};
+  const statuses = analytics.statusBreakdown || analytics.statusStats || {};
 
-  const statusData = Object.entries(analytics.statusStats).map(
-    ([key, value]) => ({
-      name: key.charAt(0).toUpperCase() + key.slice(1),
-      value,
-    })
-  );
+  const categoryData = Object.entries(categories).map(([key, value]) => ({
+    name: key.charAt(0).toUpperCase() + key.slice(1),
+    value,
+  }));
 
-  const totalEntries = Object.values(analytics.categoryStats).reduce(
-    (a, b) => a + b,
-    0
-  );
-  const urgentCount = analytics.urgentItems.length;
-  const hoaxCount = analytics.hoaxItems.length;
+  const statusData = Object.entries(statuses).map(([key, value]) => ({
+    name: key.charAt(0).toUpperCase() + key.slice(1),
+    value,
+  }));
+
+  const totalEntries =
+    analytics.totalEntries ||
+    Object.values(categories).reduce((a, b) => a + b, 0);
+  const urgentCount =
+    typeof analytics.urgentItems === "number"
+      ? analytics.urgentItems
+      : Array.isArray(analytics.urgentItems)
+      ? analytics.urgentItems.length
+      : 0;
+  const hoaxCount =
+    typeof analytics.hoaxItems === "number"
+      ? analytics.hoaxItems
+      : Array.isArray(analytics.hoaxItems)
+      ? analytics.hoaxItems.length
+      : 0;
 
   return (
     <div className="space-y-6">
@@ -140,7 +156,7 @@ export default function Dashboard() {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Selesai</p>
               <p className="text-2xl font-bold text-gray-900">
-                {analytics.statusStats.selesai || 0}
+                {statuses.selesai || 0}
               </p>
             </div>
           </div>
@@ -199,7 +215,7 @@ export default function Dashboard() {
           Tren Harian (7 Hari Terakhir)
         </h3>
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={analytics.dailyTrends}>
+          <LineChart data={analytics.dailyTrends || []}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" />
             <YAxis />
@@ -234,25 +250,32 @@ export default function Dashboard() {
             Item Mendesak
           </h3>
           <div className="space-y-3">
-            {analytics.urgentItems.slice(0, 5).map((item) => (
-              <div
-                key={item.id}
-                className="border-l-4 border-red-500 pl-4 py-2"
-              >
-                <p className="font-medium text-sm">
-                  {item.content.substring(0, 100)}...
-                </p>
-                <div className="flex items-center mt-1 text-xs text-gray-500">
-                  <span>Urgensi: {item.urgency_level}/10</span>
-                  <span className="mx-2">•</span>
-                  <span>{item.source}</span>
-                  <span className="mx-2">•</span>
-                  <span>
-                    {new Date(item.created_at).toLocaleDateString("id-ID")}
-                  </span>
+            {Array.isArray(analytics.urgentItems) ? (
+              analytics.urgentItems.slice(0, 5).map((item) => (
+                <div
+                  key={item.id}
+                  className="border-l-4 border-red-500 pl-4 py-2"
+                >
+                  <p className="font-medium text-sm">
+                    {item.content.substring(0, 100)}...
+                  </p>
+                  <div className="flex items-center mt-1 text-xs text-gray-500">
+                    <span>Urgensi: {item.urgency_level}/10</span>
+                    <span className="mx-2">•</span>
+                    <span>{item.source}</span>
+                    <span className="mx-2">•</span>
+                    <span>
+                      {new Date(item.created_at).toLocaleDateString("id-ID")}
+                    </span>
+                  </div>
                 </div>
+              ))
+            ) : (
+              <div className="text-center py-4 text-gray-500">
+                <p>Tidak ada item mendesak saat ini</p>
+                <p className="text-sm">Total item mendesak: {urgentCount}</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
       )}

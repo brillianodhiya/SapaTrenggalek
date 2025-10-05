@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { scrapeAllSources } from "@/lib/simple-scraper";
 import { analyzeContent } from "@/lib/gemini";
+import { generateContentHash } from "@/lib/content-hash";
 
 export const runtime = "nodejs";
 
@@ -29,6 +30,7 @@ export async function POST(request: NextRequest) {
     }
 
     const processedEntries = [];
+    const duplicateSkipped = [];
     const errors: string[] = [];
 
     // Process each scraped item with real Gemini AI
@@ -42,13 +44,35 @@ export async function POST(request: NextRequest) {
           }: ${item.content.substring(0, 50)}...`
         );
 
+        // Generate content hash for duplicate detection
+        const contentHash = generateContentHash(item.content);
+
+        // Check if content already exists
+        const { data: existingEntry, error: checkError } = await supabaseAdmin
+          .from("data_entries")
+          .select("id, content")
+          .eq("content_hash", contentHash)
+          .limit(1);
+
+        if (checkError) {
+          console.error(`❌ Error checking duplicates:`, checkError);
+        } else if (existingEntry && existingEntry.length > 0) {
+          console.log(`⏭️ Skipping duplicate content (hash: ${contentHash})`);
+          duplicateSkipped.push({
+            content: item.content.substring(0, 100),
+            hash: contentHash,
+            existingId: existingEntry[0].id,
+          });
+          continue; // Skip this item
+        }
+
         // Analyze content with working Gemini AI
         const aiAnalysis = await analyzeContent(item.content, item.source);
         console.log(
           `✅ AI Result: ${aiAnalysis.category} - ${aiAnalysis.sentiment}`
         );
 
-        // Prepare data for database
+        // Prepare data for database with content hash
         const entry = {
           content: item.content,
           source: item.source,
@@ -62,6 +86,7 @@ export async function POST(request: NextRequest) {
           processed_by_ai: true,
           ai_analysis: aiAnalysis,
           related_entries: [],
+          content_hash: contentHash, // Add content hash
           created_at: item.timestamp.toISOString(),
           updated_at: new Date().toISOString(),
         };
@@ -106,8 +131,9 @@ export async function POST(request: NextRequest) {
       success: true,
       processed: processedEntries.length,
       scraped: scrapedData.length,
+      duplicatesSkipped: duplicateSkipped.length,
       errors: errors.length,
-      message: `✅ Cron job completed! Processed ${processedEntries.length}/${scrapedData.length} entries`,
+      message: `✅ Cron job completed! Processed ${processedEntries.length}/${scrapedData.length} entries (${duplicateSkipped.length} duplicates skipped)`,
       timestamp: new Date().toISOString(),
       summary: {
         categories: processedEntries.reduce((acc, entry) => {
@@ -120,7 +146,9 @@ export async function POST(request: NextRequest) {
         potential_hoax: processedEntries.filter(
           (entry) => entry.hoax_probability >= 70
         ).length,
+        duplicates_prevented: duplicateSkipped.length,
       },
+      duplicateDetails: duplicateSkipped.slice(0, 5), // Show first 5 duplicates
     };
 
     if (errors.length > 0) {

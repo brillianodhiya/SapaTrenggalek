@@ -31,8 +31,15 @@ export default function VectorSearch() {
     if (!query.trim()) return;
 
     setLoading(true);
+    console.log("🔍 Frontend: Starting search...", {
+      query: query.trim(),
+      type: searchType,
+      threshold,
+      maxResults: 10,
+    });
+
     try {
-      const response = await fetch("/api/search", {
+      const response = await fetch("/api/search-debug", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -43,12 +50,19 @@ export default function VectorSearch() {
         }),
       });
 
+      console.log("📡 Frontend: Response status:", response.status);
       const data = await response.json();
+      console.log("📥 Frontend: Response data:", data);
 
       if (searchType === "hoax") {
+        console.log("🚫 Frontend: Setting hoax results");
         setHoaxResults(data.results);
         setResults([]);
       } else {
+        console.log(
+          "✅ Frontend: Setting search results, count:",
+          data.results?.length || 0
+        );
         setResults(data.results || []);
         setHoaxResults(null);
       }

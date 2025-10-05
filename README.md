@@ -42,6 +42,25 @@ Sistem Intelijen dan Agregasi Informasi Publik untuk Pemerintah Kabupaten Trengg
 - Manajemen status laporan
 - Analitik dan pelaporan
 
+### 6. Instagram Integration
+
+- **Official API**: Menggunakan Instagram Graph API resmi
+- **Authenticated Media**: Akses media dari akun terautentikasi
+- **Real-time Analytics**: Engagement metrics dan media statistics
+- **Rate Limiting**: Mengikuti kebijakan resmi Instagram (200 req/hour)
+
+> **Note**: Instagram integration memerlukan access token. Lihat [Instagram Integration Guide](INSTAGRAM-INTEGRATION.md) untuk setup lengkap.
+
+### 7. Facebook Integration
+
+- **Graph API**: Menggunakan Facebook Graph API resmi
+- **Page Posts**: Akses posts dari Facebook pages
+- **Complete Engagement**: Likes, comments, shares, reactions
+- **Multiple Post Types**: Status, photo, video, link, event
+- **Real-time Data**: Data langsung dari Facebook
+
+> **Note**: Facebook integration memerlukan access token. Lihat [Facebook Integration Guide](FACEBOOK-INTEGRATION.md) untuk setup lengkap.
+
 ## 🛠️ Teknologi
 
 - **Framework**: Next.js 14 (Full-stack)
@@ -97,6 +116,13 @@ GEMINI_API_KEY=your_gemini_api_key
 CRON_SECRET=your_secure_random_string
 NEXTAUTH_SECRET=your_nextauth_secret
 NEXTAUTH_URL=http://localhost:3000
+
+# Instagram Official API (Optional)
+INSTAGRAM_ACCESS_TOKEN=your_instagram_access_token
+INSTAGRAM_SECRET_KEY=your_instagram_app_secret
+
+# Facebook Official API (Optional)
+FACEBOOK_ACCESS_TOKEN=your_facebook_access_token
 ```
 
 4. **Setup database**
