@@ -12,26 +12,50 @@ jobs:
 
     steps:
       - name: Trigger Scraping API
+        timeout-minutes: 5
         run: |
           echo "🚀 Starting scraping cronjob..."
 
-          response=$(curl -s -w "\n%{http_code}" -X POST "${{ secrets.SCRAPING_ENDPOINT }}" \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            -H "Content-Type: application/json" \
-            -d '{"source": "github-actions", "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}')
+          # Add timeout and retry logic
+          for attempt in 1 2 3; do
+            echo "🔄 Attempt $attempt/3..."
+            
+            response=$(timeout 120s curl -s -w "\n%{http_code}" -X POST "${{ secrets.SCRAPING_ENDPOINT }}" \
+              -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+              -H "Content-Type: application/json" \
+              -d '{"source": "github-actions", "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'", "attempt": '$attempt'}') || {
+              echo "⏰ Request timed out on attempt $attempt"
+              if [ $attempt -eq 3 ]; then
+                echo "❌ All attempts failed due to timeout"
+                exit 1
+              fi
+              continue
+            }
 
-          http_code=$(echo "$response" | tail -n1)
-          body=$(echo "$response" | head -n -1)
+            http_code=$(echo "$response" | tail -n1)
+            body=$(echo "$response" | head -n -1)
 
-          echo "📊 Response Code: $http_code"
-          echo "📋 Response Body: $body"
+            echo "📊 Response Code: $http_code"
+            echo "📋 Response Body: $body"
 
-          if [ "$http_code" -eq 200 ]; then
-            echo "✅ Scraping completed successfully"
-          else
-            echo "❌ Scraping failed with code $http_code"
-            exit 1
-          fi
+            if [ "$http_code" -eq 200 ]; then
+              echo "✅ Scraping completed successfully on attempt $attempt"
+              break
+            elif [ "$http_code" -eq 504 ]; then
+              echo "⏰ Function timeout (504) on attempt $attempt"
+              if [ $attempt -eq 3 ]; then
+                echo "❌ All attempts failed due to function timeout"
+                exit 1
+              fi
+              sleep 30  # Wait before retry
+            else
+              echo "❌ Scraping failed with code $http_code on attempt $attempt"
+              if [ $attempt -eq 3 ]; then
+                exit 1
+              fi
+              sleep 10  # Wait before retry
+            fi
+          done
 
       - name: Log Completion
         if: always()

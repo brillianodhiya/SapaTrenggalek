@@ -6,6 +6,7 @@ import { generateContentHash } from "@/lib/content-hash";
 import { updateEntryEmbedding } from "@/lib/embeddings";
 
 export const runtime = "nodejs";
+export const maxDuration = 60; // 60 seconds timeout
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,15 +34,26 @@ export async function POST(request: NextRequest) {
     const processedEntries = [];
     const duplicateSkipped = [];
     const errors: string[] = [];
+    const embeddingQueue = []; // Queue for embedding generation
+
+    // Limit processing to avoid timeout (max 10 items per run)
+    const maxItemsPerRun = 10;
+    const itemsToProcess = scrapedData.slice(0, maxItemsPerRun);
+
+    if (scrapedData.length > maxItemsPerRun) {
+      console.log(
+        `⚠️ Limited processing to ${maxItemsPerRun} items (${scrapedData.length} total scraped)`
+      );
+    }
 
     // Process each scraped item with real Gemini AI
-    for (let i = 0; i < scrapedData.length; i++) {
-      const item = scrapedData[i];
+    for (let i = 0; i < itemsToProcess.length; i++) {
+      const item = itemsToProcess[i];
 
       try {
         console.log(
           `🤖 Processing ${i + 1}/${
-            scrapedData.length
+            itemsToProcess.length
           }: ${item.content.substring(0, 50)}...`
         );
 
@@ -107,23 +119,17 @@ export async function POST(request: NextRequest) {
             `✅ Saved: ${aiAnalysis.category} - ${aiAnalysis.sentiment}`
           );
 
-          // Generate embedding for the new entry
-          try {
-            console.log(`🔗 Generating embedding for entry ${data[0].id}...`);
-            await updateEntryEmbedding(data[0].id, item.content);
-            console.log(`✅ Embedding generated for entry ${data[0].id}`);
-          } catch (embeddingError) {
-            console.error(
-              `⚠️ Embedding generation failed for entry ${data[0].id}:`,
-              embeddingError
-            );
-            // Don't fail the whole process if embedding fails
-          }
+          // Queue entry for embedding generation (don't wait for it)
+          embeddingQueue.push({
+            id: data[0].id,
+            content: item.content,
+          });
+          console.log(`📝 Queued embedding generation for entry ${data[0].id}`);
         }
 
         // Add delay between AI calls to avoid rate limiting
-        if (i < scrapedData.length - 1) {
-          await new Promise((resolve) => setTimeout(resolve, 2500)); // Slightly longer delay for embedding generation
+        if (i < itemsToProcess.length - 1) {
+          await new Promise((resolve) => setTimeout(resolve, 1500)); // Reduced delay since no embedding generation
         }
       } catch (error) {
         console.error(`❌ Error processing item ${i + 1}:`, error);
@@ -145,9 +151,11 @@ export async function POST(request: NextRequest) {
       success: true,
       processed: processedEntries.length,
       scraped: scrapedData.length,
+      limited: scrapedData.length > maxItemsPerRun,
       duplicatesSkipped: duplicateSkipped.length,
       errors: errors.length,
-      message: `✅ Cron job completed! Processed ${processedEntries.length}/${scrapedData.length} entries (${duplicateSkipped.length} duplicates skipped)`,
+      embeddingsQueued: embeddingQueue.length,
+      message: `✅ Cron job completed! Processed ${processedEntries.length}/${itemsToProcess.length} entries (${duplicateSkipped.length} duplicates skipped, ${embeddingQueue.length} embeddings queued)`,
       timestamp: new Date().toISOString(),
       summary: {
         categories: processedEntries.reduce((acc, entry) => {
@@ -163,10 +171,24 @@ export async function POST(request: NextRequest) {
         duplicates_prevented: duplicateSkipped.length,
       },
       duplicateDetails: duplicateSkipped.slice(0, 5), // Show first 5 duplicates
+      performance: {
+        maxItemsPerRun,
+        totalScraped: scrapedData.length,
+        actualProcessed: itemsToProcess.length,
+        embeddingsQueued: embeddingQueue.length,
+      },
     };
 
     if (errors.length > 0) {
       console.log(`⚠️ ${errors.length} errors occurred during processing`);
+    }
+
+    // Process embeddings asynchronously after response (don't wait)
+    if (embeddingQueue.length > 0) {
+      console.log(
+        `🔗 Starting async embedding generation for ${embeddingQueue.length} entries...`
+      );
+      processEmbeddingsAsync(embeddingQueue);
     }
 
     return NextResponse.json(response);
@@ -182,6 +204,29 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+async function processEmbeddingsAsync(
+  embeddingQueue: Array<{ id: string; content: string }>
+) {
+  console.log(
+    `🔗 Processing ${embeddingQueue.length} embeddings asynchronously...`
+  );
+
+  for (const item of embeddingQueue) {
+    try {
+      await updateEntryEmbedding(item.id, item.content);
+      console.log(`✅ Embedding generated for entry ${item.id}`);
+
+      // Small delay to avoid rate limiting
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    } catch (error) {
+      console.error(`⚠️ Async embedding failed for entry ${item.id}:`, error);
+      // Continue with next item even if one fails
+    }
+  }
+
+  console.log(`🎉 Async embedding generation completed`);
 }
 
 async function groupSimilarEntries() {

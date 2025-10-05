@@ -3,6 +3,7 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 import { batchUpdateEmbeddings } from "@/lib/embeddings";
 
 export const runtime = "nodejs";
+export const maxDuration = 60; // 60 seconds timeout
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
     // 1. Update embeddings for entries without embeddings
     console.log("📊 Step 1: Updating embeddings...");
     try {
-      const embeddingLimit = 25; // Process 25 entries per run to avoid timeout
+      const embeddingLimit = 15; // Reduced to 15 entries per run to avoid timeout
       const updatedCount = await batchUpdateEmbeddings(embeddingLimit);
       results.embeddings.processed = updatedCount;
       console.log(`✅ Updated ${updatedCount} embeddings`);

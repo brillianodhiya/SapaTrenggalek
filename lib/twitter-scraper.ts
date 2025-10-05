@@ -1,7 +1,7 @@
 // Twitter/X API v2 Scraper for Sapa Trenggalek
 import { TwitterApi } from "twitter-api-v2";
 
-interface TwitterScrapedData {
+export interface TwitterScrapedData {
   content: string;
   source: string;
   source_url: string;
@@ -22,7 +22,7 @@ interface TwitterScrapedData {
   };
 }
 
-class TwitterScraper {
+export class TwitterScraper {
   private client: TwitterApi;
   private keywords: string[];
 
@@ -242,8 +242,8 @@ class TwitterScraper {
     // Build search query with keywords and filters
     const keywordQuery = this.keywords.map((k) => `"${k}"`).join(" OR ");
 
-    // Add filters: exclude retweets, only Indonesian language
-    return `(${keywordQuery}) -is:retweet lang:id`;
+    // Add filters: exclude retweets (remove lang filter as it might be causing issues)
+    return `(${keywordQuery}) -is:retweet`;
   }
 
   private cleanTweetText(text: string): string {
@@ -314,4 +314,4 @@ class TwitterScraper {
   }
 }
 
-export { TwitterScraper, type TwitterScrapedData };
+// Exports are already done above with export keyword
