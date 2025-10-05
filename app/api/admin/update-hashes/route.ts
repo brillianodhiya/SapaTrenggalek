@@ -40,7 +40,10 @@ export async function POST() {
           updated++;
         }
       } catch (err) {
-        errors.push({ id: entry.id, error: err.message });
+        errors.push({
+          id: entry.id,
+          error: err instanceof Error ? err.message : String(err),
+        });
       }
     }
 
@@ -59,7 +62,10 @@ export async function POST() {
   } catch (error) {
     console.error("❌ Hash update error:", error);
     return NextResponse.json(
-      { error: "Internal server error", details: error.message },
+      {
+        error: "Internal server error",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     );
   }

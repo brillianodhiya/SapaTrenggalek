@@ -123,7 +123,9 @@ export async function DELETE(request: NextRequest) {
       .neq("id", "00000000-0000-0000-0000-000000000000"); // Delete all (dummy condition)
 
     if (deleteError) {
-      throw new Error(`Delete failed: ${deleteError.message}`);
+      throw new Error(
+        `Delete failed: ${deleteError?.message || "Unknown error"}`
+      );
     }
 
     // Verify deletion

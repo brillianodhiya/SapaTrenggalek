@@ -158,7 +158,12 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error("Error creating entry:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json(
+        {
+          error: error?.message || "Database error",
+        },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ data: data[0] });
@@ -197,7 +202,12 @@ export async function PATCH(request: NextRequest) {
       .select();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json(
+        {
+          error: error?.message || "Database error",
+        },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ data: data[0] });

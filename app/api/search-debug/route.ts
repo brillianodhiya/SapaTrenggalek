@@ -29,7 +29,10 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error("❌ Database error:", error);
       return NextResponse.json(
-        { error: "Database error", details: error.message },
+        {
+          error: "Database error",
+          details: error instanceof Error ? error.message : String(error),
+        },
         { status: 500 }
       );
     }
@@ -62,13 +65,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(response);
   } catch (error) {
     console.error("❌ Debug search error:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
       {
         error: "Internal server error",
-        details: error.message,
+        details: errorMessage,
         debug: {
           timestamp: new Date().toISOString(),
-          error: error.message,
+          error: errorMessage,
         },
       },
       { status: 500 }

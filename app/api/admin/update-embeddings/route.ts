@@ -91,7 +91,9 @@ export async function GET() {
     );
 
     if (statsError) {
-      throw new Error(`Error fetching statistics: ${statsError.message}`);
+      throw new Error(
+        `Error fetching statistics: ${statsError?.message || "Unknown error"}`
+      );
     }
 
     const stats = statsResult?.[0] || {

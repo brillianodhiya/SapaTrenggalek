@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error: "Twitter scraping failed",
-        details: error.message,
+        details: error instanceof Error ? error.message : String(error),
         timestamp: new Date().toISOString(),
       },
       { status: 500 }
@@ -152,7 +152,7 @@ export async function GET() {
     return NextResponse.json(
       {
         error: "Twitter scraper status check failed",
-        details: error.message,
+        details: error instanceof Error ? error.message : String(error),
       },
       { status: 500 }
     );

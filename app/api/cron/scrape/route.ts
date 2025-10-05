@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
 
         if (error) {
           console.error(`❌ Database insert error for item ${i + 1}:`, error);
-          errors.push(`Item ${i + 1}: ${error.message}`);
+          errors.push(`Item ${i + 1}: ${error?.message || "Database error"}`);
         } else {
           processedEntries.push(data[0]);
           console.log(

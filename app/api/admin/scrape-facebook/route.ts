@@ -122,7 +122,8 @@ export async function POST(request: NextRequest) {
     console.error("❌ Facebook scraping error:", error);
 
     // Handle specific Facebook API errors
-    if (error.message?.includes("429")) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes("429")) {
       return NextResponse.json(
         {
           error: "Rate limit exceeded",
@@ -133,7 +134,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (error.message?.includes("401") || error.message?.includes("400")) {
+    if (errorMessage.includes("401") || errorMessage.includes("400")) {
       return NextResponse.json(
         {
           error: "Authentication failed",
