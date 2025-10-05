@@ -145,7 +145,7 @@ export default function HomePage() {
                 <div className="p-6">
                   <div className="flex items-center text-sm text-gray-500 mb-2">
                     <Calendar className="h-4 w-4 mr-1" />
-                    <span>15 Desember 2024</span>
+                    <span>15 Desember 2025</span>
                     <span className="mx-2">•</span>
                     <span>Berita</span>
                   </div>

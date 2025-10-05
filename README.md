@@ -287,4 +287,4 @@ Untuk pertanyaan dan dukungan teknis, hubungi tim pengembang.
 ---
 
 **Pemerintah Kabupaten Trenggalek**  
-Sistem Aspirasi & Pengaduan Analitik © 2024
+Sistem Aspirasi & Pengaduan Analitik © 2025

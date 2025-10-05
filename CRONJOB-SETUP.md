@@ -166,7 +166,7 @@ curl -X POST "https://your-app.vercel.app/api/cron/scrape" \
   "scraped": 6,
   "errors": 0,
   "message": "✅ Cron job completed! Processed 5/6 entries",
-  "timestamp": "2024-12-15T10:30:00.000Z",
+  "timestamp": "2025-12-15T10:30:00.000Z",
   "summary": {
     "categories": {
       "berita": 3,
@@ -186,7 +186,7 @@ curl -X POST "https://your-app.vercel.app/api/cron/scrape" \
   "success": false,
   "error": "Cron job failed",
   "details": "Error message here",
-  "timestamp": "2024-12-15T10:30:00.000Z"
+  "timestamp": "2025-12-15T10:30:00.000Z"
 }
 ```
 

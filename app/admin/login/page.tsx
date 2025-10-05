@@ -146,7 +146,7 @@ export default function LoginPage() {
         {/* Footer */}
         <div className="text-center mt-8">
           <p className="text-sm text-gray-500">
-            © 2024 Pemerintah Kabupaten Trenggalek
+            © 2025 Pemerintah Kabupaten Trenggalek
           </p>
         </div>
       </div>

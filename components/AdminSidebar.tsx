@@ -184,7 +184,7 @@ export default function AdminSidebar({ activeTab }: AdminSidebarProps) {
           <div className="p-4 border-t border-gray-200">
             <div className="text-xs text-gray-500 text-center">
               <p>Pemerintah Kabupaten Trenggalek</p>
-              <p className="mt-1">© 2024 - Sistem Aspirasi & Pengaduan</p>
+              <p className="mt-1">© 2025 - Sistem Aspirasi & Pengaduan</p>
             </div>
           </div>
         </div>
