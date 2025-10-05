@@ -67,18 +67,6 @@ export default function UrgentItemsPage() {
     }
   }, [status, router]);
 
-  if (status === "loading") {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    );
-  }
-
-  if (!session) {
-    return null;
-  }
-
   const fetchUrgentItems = async () => {
     try {
       setLoading(true);
@@ -216,6 +204,19 @@ export default function UrgentItemsPage() {
 
     return () => clearInterval(interval);
   }, [filters]);
+
+  // Handle loading and authentication states
+  if (status === "loading") {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return null;
+  }
 
   return (
     <AdminLayout title="Item Mendesak" activeTab="urgent">
