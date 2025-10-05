@@ -3,7 +3,7 @@ name: Scheduled Data Scraping
 on:
   schedule:
     # Run every 6 hours (adjust as needed)
-    - cron: "0 */4 * * *"
+    - cron: "0 */1 * * *"
   workflow_dispatch: # Allow manual trigger
 
 jobs:
