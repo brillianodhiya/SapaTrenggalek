@@ -29,8 +29,10 @@ interface AnalyticsData {
   categoriesBreakdown: Record<string, number>;
   statusBreakdown: Record<string, number>;
   sentimentBreakdown: Record<string, number>;
-  urgentItems: number | any[];
-  hoaxItems: number | any[];
+  urgentItems: any[]; // Array of urgent items
+  urgentItemsCount?: number; // Count of urgent items
+  hoaxItems: any[]; // Array of hoax items
+  hoaxItemsCount?: number; // Count of hoax items
   dailyTrends: any[];
   topSources: any[];
   // Legacy support for old format
@@ -51,11 +53,31 @@ export default function Dashboard() {
 
   const fetchAnalytics = async () => {
     try {
+      console.log("🔄 Fetching analytics data...");
       const response = await fetch("/api/analytics");
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
+      console.log("📊 Analytics data received:", data);
       setAnalytics(data);
     } catch (error) {
-      console.error("Error fetching analytics:", error);
+      console.error("❌ Error fetching analytics:", error);
+      // Set fallback data to prevent empty dashboard
+      setAnalytics({
+        totalEntries: 0,
+        categoriesBreakdown: {},
+        statusBreakdown: {},
+        sentimentBreakdown: {},
+        urgentItems: [],
+        urgentItemsCount: 0,
+        hoaxItems: [],
+        hoaxItemsCount: 0,
+        dailyTrends: [],
+        topSources: [],
+      });
     } finally {
       setLoading(false);
     }
@@ -73,6 +95,12 @@ export default function Dashboard() {
     return (
       <div className="text-center py-12">
         <p className="text-gray-500">Gagal memuat data analitik</p>
+        <button
+          onClick={fetchAnalytics}
+          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          🔄 Coba Lagi
+        </button>
       </div>
     );
   }
@@ -95,21 +123,33 @@ export default function Dashboard() {
   const totalEntries =
     analytics.totalEntries ||
     Object.values(categories).reduce((a, b) => a + b, 0);
-  const urgentCount =
-    typeof analytics.urgentItems === "number"
-      ? analytics.urgentItems
-      : Array.isArray(analytics.urgentItems)
-      ? analytics.urgentItems.length
-      : 0;
-  const hoaxCount =
-    typeof analytics.hoaxItems === "number"
-      ? analytics.hoaxItems
-      : Array.isArray(analytics.hoaxItems)
-      ? analytics.hoaxItems.length
-      : 0;
+
+  // Use the new API format
+  const urgentItems = Array.isArray(analytics.urgentItems)
+    ? analytics.urgentItems
+    : [];
+  const urgentCount = analytics.urgentItemsCount || urgentItems.length || 0;
+
+  const hoaxItems = Array.isArray(analytics.hoaxItems)
+    ? analytics.hoaxItems
+    : [];
+  const hoaxCount = analytics.hoaxItemsCount || hoaxItems.length || 0;
 
   return (
     <div className="space-y-6">
+      {/* Debug Info & Refresh Button */}
+      <div className="flex justify-between items-center">
+        <div className="text-sm text-gray-500">
+          Data terakhir dimuat: {new Date().toLocaleTimeString("id-ID")}
+        </div>
+        <button
+          onClick={fetchAnalytics}
+          className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+        >
+          🔄 Refresh Data
+        </button>
+      </div>
+
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="card">
@@ -214,32 +254,42 @@ export default function Dashboard() {
         <h3 className="text-lg font-semibold mb-4">
           Tren Harian (7 Hari Terakhir)
         </h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={analytics.dailyTrends || []}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" />
-            <YAxis />
-            <Tooltip />
-            <Line
-              type="monotone"
-              dataKey="berita"
-              stroke="#3b82f6"
-              name="Berita"
-            />
-            <Line
-              type="monotone"
-              dataKey="laporan"
-              stroke="#ef4444"
-              name="Laporan"
-            />
-            <Line
-              type="monotone"
-              dataKey="aspirasi"
-              stroke="#10b981"
-              name="Aspirasi"
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        {analytics.dailyTrends && analytics.dailyTrends.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={analytics.dailyTrends}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="date"
+                tickFormatter={(value) =>
+                  new Date(value).toLocaleDateString("id-ID", {
+                    month: "short",
+                    day: "numeric",
+                  })
+                }
+              />
+              <YAxis />
+              <Tooltip
+                labelFormatter={(value) =>
+                  new Date(value).toLocaleDateString("id-ID")
+                }
+              />
+              <Line
+                type="monotone"
+                dataKey="count"
+                stroke="#3b82f6"
+                name="Total Entri"
+                strokeWidth={2}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="text-center py-12 text-gray-500">
+            <p>Tidak ada data tren harian</p>
+            <p className="text-sm mt-2">
+              Data akan muncul setelah ada aktivitas dalam 7 hari terakhir
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Urgent Items */}
@@ -250,8 +300,8 @@ export default function Dashboard() {
             Item Mendesak
           </h3>
           <div className="space-y-3">
-            {Array.isArray(analytics.urgentItems) ? (
-              analytics.urgentItems.slice(0, 5).map((item) => (
+            {urgentItems.length > 0 ? (
+              urgentItems.slice(0, 5).map((item) => (
                 <div
                   key={item.id}
                   className="border-l-4 border-red-500 pl-4 py-2"

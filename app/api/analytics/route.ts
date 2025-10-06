@@ -150,8 +150,10 @@ export async function GET(request: Request) {
       totalEntries: categoryData?.length || 0,
       categoriesBreakdown: categoryStats || {},
       sentimentBreakdown: sentimentStats || {},
-      urgentItems: urgentItems?.length || 0,
-      hoaxItems: hoaxItems?.length || 0,
+      urgentItems: urgentItems || [], // Return the actual array
+      urgentItemsCount: urgentItems?.length || 0, // Also provide count
+      hoaxItems: hoaxItems || [], // Return the actual array
+      hoaxItemsCount: hoaxItems?.length || 0, // Also provide count
       statusBreakdown: statusStats || {},
       dailyTrends: dailyTrendsArray,
       topSources: topSources,
@@ -178,8 +180,10 @@ function getDemoAnalytics() {
       netral: 71,
       negatif: 23,
     },
-    urgentItems: 12,
-    hoaxItems: 8,
+    urgentItems: [], // Empty array for demo
+    urgentItemsCount: 12,
+    hoaxItems: [], // Empty array for demo
+    hoaxItemsCount: 8,
     statusBreakdown: {
       baru: 34,
       diverifikasi: 45,
