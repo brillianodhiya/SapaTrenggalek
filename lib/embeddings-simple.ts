@@ -1,5 +1,16 @@
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
+// Clean content function to remove URLs and HTML
+function cleanContent(content: string): string {
+  return content
+    .replace(/https?:\/\/[^\s]+/g, "") // Remove URLs
+    .replace(/<[^>]*>/g, "") // Remove HTML tags
+    .replace(/&lt;[^&]*&gt;/g, "") // Remove encoded HTML
+    .replace(/&[a-zA-Z]+;/g, "") // Remove HTML entities
+    .replace(/\s+/g, " ") // Replace multiple spaces with single space
+    .trim();
+}
+
 // Simple text-based search that definitely works
 export async function findSimilarContent(
   queryText: string,
@@ -23,9 +34,10 @@ export async function findSimilarContent(
 
     console.log(`✅ Simple search found ${data?.length || 0} results`);
 
-    // Return results with similarity scores
+    // Return results with similarity scores and cleaned content
     return (data || []).map((item, index) => ({
       ...item,
+      content: cleanContent(item.content),
       similarity_score: Math.max(0.7, 0.95 - index * 0.05),
     }));
   } catch (error) {

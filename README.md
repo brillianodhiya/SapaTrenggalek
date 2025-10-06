@@ -17,30 +17,22 @@ Platform digital untuk mendengar suara masyarakat Trenggalek
 
 ## 🚀 Fitur Platform
 
-Platform ini membantu dalam:
+### Core Features
 
-- **Melawan Misinformasi**: Mengidentifikasi dan memverifikasi berita yang berpotensi hoaks
-- **Menjaring Aspirasi & Laporan**: Menangkap suara, keluhan, dan harapan masyarakat secara real-time
-- **Mendukung Pengambilan Keputusan**: Menyediakan data analitik untuk kebijakan berbasis data
+- **📰 News Aggregation** - Otomatis mengumpulkan berita dari berbagai sumber
+- **🤖 AI Classification** - Kategorisasi dan analisis sentimen otomatis
+- **🔍 Hoax Detection** - Sistem deteksi misinformasi
+- **💬 Public Aspirations** - Platform aspirasi dan keluhan masyarakat
+- **📊 Analytics Dashboard** - Visualisasi data dan trends
+- **🔎 Vector Search** - Pencarian semantik menggunakan embeddings
 
-## 🚀 Fitur Utama
+### Advanced Features
 
-### 1. Agregator Data Otomatis
-
-- Scraping otomatis dari media sosial dan portal berita
-- Monitoring berdasarkan kata kunci yang relevan
-- Penyimpanan data terpusat
-
-### 2. Klasifikasi Konten Berbasis AI
-
-- Kategorisasi otomatis: Berita, Laporan, Aspirasi, Lainnya
-- Analisis sentimen: Positif, Negatif, Netral
-- Penilaian tingkat urgensi (1-10)
-
-### 3. Analisis & Deteksi Hoaks
-
-- Skor probabilitas hoaks (0-100%)
-- Analisis kredibilitas sumber
+- **📱 Social Media Integration** - Twitter, Instagram, Facebook
+- **🖼️ Smart Image Extraction** - Otomatis tanpa placeholder
+- **📈 Trends Analysis** - Monitoring dan analisis tren
+- **⚡ Urgent Items Management** - Penanganan item prioritas
+- **🤖 Automated Cronjobs** - Proses otomatis setiap 2 jam
 - Deteksi bahasa provokatif
 
 ### 4. Deteksi Isu Serupa & Analisis Tren

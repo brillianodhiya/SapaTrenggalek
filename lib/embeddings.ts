@@ -3,6 +3,17 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
+// Clean content function to remove URLs and HTML
+function cleanContent(content: string): string {
+  return content
+    .replace(/https?:\/\/[^\s]+/g, "") // Remove URLs
+    .replace(/<[^>]*>/g, "") // Remove HTML tags
+    .replace(/&lt;[^&]*&gt;/g, "") // Remove encoded HTML
+    .replace(/&[a-zA-Z]+;/g, "") // Remove HTML entities
+    .replace(/\s+/g, " ") // Replace multiple spaces with single space
+    .trim();
+}
+
 // Generate embedding for text content
 export async function generateEmbedding(text: string): Promise<number[]> {
   try {
@@ -71,7 +82,11 @@ export async function findSimilarContent(
       return [];
     }
 
-    return data || [];
+    // Clean content in results
+    return (data || []).map((item: { content: any }) => ({
+      ...item,
+      content: cleanContent(item.content || ""),
+    }));
   } catch (error) {
     console.error("Error in findSimilarContent:", error);
     return [];

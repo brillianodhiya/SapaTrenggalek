@@ -39,7 +39,7 @@ export default function VectorSearch() {
     });
 
     try {
-      const response = await fetch("/api/search-debug", {
+      const response = await fetch("/api/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -176,14 +176,26 @@ export default function VectorSearch() {
                         {result.category}
                       </span>
                       <span className="text-sm text-gray-500 ml-2">
-                        {result.source}
+                        {result.source.length > 30
+                          ? `${result.source.substring(0, 30)}...`
+                          : result.source}
                       </span>
                     </div>
 
                     <p className="text-gray-800 mb-2">
-                      {result.content.length > 200
-                        ? `${result.content.substring(0, 200)}...`
-                        : result.content}
+                      {(() => {
+                        // Clean up content - remove URLs and HTML
+                        let cleanContent = result.content
+                          .replace(/https?:\/\/[^\s]+/g, "") // Remove URLs
+                          .replace(/<[^>]*>/g, "") // Remove HTML tags
+                          .replace(/&lt;[^&]*&gt;/g, "") // Remove encoded HTML
+                          .replace(/&[a-zA-Z]+;/g, "") // Remove HTML entities
+                          .trim();
+
+                        return cleanContent.length > 150
+                          ? `${cleanContent.substring(0, 150)}...`
+                          : cleanContent;
+                      })()}
                     </p>
                   </div>
 
