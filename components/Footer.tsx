@@ -9,22 +9,29 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-4">Sapa Trenggalek</h3>
             <p className="text-gray-300 text-sm">
-              Sistem Aspirasi & Pengaduan Analitik untuk Pemerintah Kabupaten
-              Trenggalek. Platform digital untuk mendengar suara masyarakat dan
-              meningkatkan pelayanan publik.
+              Platform digital untuk mendengar suara masyarakat Trenggalek.
+              Dikembangkan sebagai project volunteer untuk membantu membangun
+              Trenggalek dan mengenalkan teknologi kepada masyarakat.
             </p>
           </div>
 
-          {/* Legal Links */}
+          {/* Project Info */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">
-              Kebijakan & Ketentuan
-            </h3>
+            <h3 className="text-lg font-semibold mb-4">Tentang Project</h3>
             <ul className="space-y-2 text-sm">
+              <li className="text-gray-300">
+                🎯 <strong>Tujuan:</strong> Membangun Trenggalek
+              </li>
+              <li className="text-gray-300">
+                💡 <strong>Misi:</strong> Mengenalkan teknologi
+              </li>
+              <li className="text-gray-300">
+                🤝 <strong>Status:</strong> Volunteer project
+              </li>
               <li>
                 <Link
                   href="/privacy-policy"
-                  className="text-gray-300 hover:text-white transition-colors"
+                  className="text-blue-400 hover:text-blue-300 transition-colors"
                 >
                   Kebijakan Privasi
                 </Link>
@@ -32,38 +39,46 @@ export default function Footer() {
               <li>
                 <Link
                   href="/terms-of-service"
-                  className="text-gray-300 hover:text-white transition-colors"
+                  className="text-blue-400 hover:text-blue-300 transition-colors"
                 >
                   Ketentuan Layanan
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/data-deletion"
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
-                  Penghapusan Data Pengguna
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Contact Info */}
+          {/* Developer Info */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Kontak</h3>
+            <h3 className="text-lg font-semibold mb-4">Dikembangkan Oleh</h3>
             <div className="text-gray-300 text-sm space-y-2">
               <p>
-                <strong>Pemerintah Kabupaten Trenggalek</strong>
+                <strong>TitaniaLabs</strong>
               </p>
-              <p>
-                Jl. Raya Trenggalek-Tulungagung KM 4<br />
-                Trenggalek, Jawa Timur
+              <p className="text-xs text-gray-400">
+                Volunteer Project untuk Trenggalek
               </p>
-              <p>
-                Telepon: (0355) 791019
-                <br />
-                Email: humas@trenggalekkab.go.id
-              </p>
+              <div className="space-y-1">
+                <p>
+                  <a
+                    href="https://www.linkedin.com/in/brilliano-dhiya-ulhaq-44b196194/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:text-blue-300 transition-colors"
+                  >
+                    @brillianodhiya
+                  </a>
+                </p>
+                <p>
+                  <a
+                    href="https://www.linkedin.com/in/aulia-zulfaa-144b78259/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:text-blue-300 transition-colors"
+                  >
+                    @auliazulfa
+                  </a>
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -72,8 +87,8 @@ export default function Footer() {
         <div className="border-t border-gray-700 mt-8 pt-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">
-              © {new Date().getFullYear()} Pemerintah Kabupaten Trenggalek. All
-              rights reserved.
+              © {new Date().getFullYear()} TitaniaLabs. Volunteer project untuk
+              membangun Trenggalek.
             </p>
             <div className="flex space-x-4 mt-4 md:mt-0">
               <Link

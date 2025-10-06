@@ -1,0 +1,25 @@
+name: Image Extraction Cron
+
+on:
+  schedule:
+    # Run every 2 hours
+    - cron: "0 */2 * * *"
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  extract-images:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Extract Images from News
+        run: |
+          curl -X GET "${{ secrets.VERCEL_URL }}/api/cron/extract-images" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --max-time 300 \
+            --retry 2 \
+            --retry-delay 30
+        continue-on-error: true
+
+      - name: Log completion
+        run: echo "Image extraction cron job completed at $(date)"

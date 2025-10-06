@@ -1,10 +1,23 @@
 # Sapa Trenggalek - Sistem Aspirasi & Pengaduan Analitik
 
-Sistem Intelijen dan Agregasi Informasi Publik untuk Pemerintah Kabupaten Trenggalek
+Platform digital untuk mendengar suara masyarakat Trenggalek
 
-## 🎯 Tujuan Aplikasi
+## 🎯 Tentang Project
 
-"Sapa Trenggalek" adalah platform digital berbasis web yang dirancang untuk membantu Pemerintah Kabupaten Trenggalek dalam:
+"Sapa Trenggalek" adalah project volunteer dari **TitaniaLabs** yang dikembangkan dengan tujuan:
+
+- 🏗️ **Membangun Trenggalek** melalui teknologi digital
+- 💡 **Mengenalkan teknologi** kepada masyarakat
+- 🤝 **Volunteer project** untuk kemajuan daerah
+
+### 👥 Tim Developer
+
+- **[@brillianodhiya](https://www.linkedin.com/in/brilliano-dhiya-ulhaq-44b196194/)** - TitaniaLabs
+- **[@auliazulfa](https://www.linkedin.com/in/aulia-zulfaa-144b78259/)** - TitaniaLabs
+
+## 🚀 Fitur Platform
+
+Platform ini membantu dalam:
 
 - **Melawan Misinformasi**: Mengidentifikasi dan memverifikasi berita yang berpotensi hoaks
 - **Menjaring Aspirasi & Laporan**: Menangkap suara, keluhan, dan harapan masyarakat secara real-time
@@ -278,13 +291,16 @@ SELECT * FROM data_entries WHERE created_at >= NOW() - INTERVAL '30 days';
 
 ## 📄 Lisensi
 
-Aplikasi ini dikembangkan untuk Pemerintah Kabupaten Trenggalek.
+Project volunteer ini dikembangkan oleh TitaniaLabs untuk membantu membangun Trenggalek.
 
 ## 📞 Support
 
-Untuk pertanyaan dan dukungan teknis, hubungi tim pengembang.
+Untuk pertanyaan dan dukungan teknis, hubungi tim pengembang melalui LinkedIn:
+
+- [@brillianodhiya](https://www.linkedin.com/in/brilliano-dhiya-ulhaq-44b196194/)
+- [@auliazulfa](https://www.linkedin.com/in/aulia-zulfaa-144b78259/)
 
 ---
 
-**Pemerintah Kabupaten Trenggalek**  
-Sistem Aspirasi & Pengaduan Analitik © 2025
+**TitaniaLabs**  
+Volunteer project untuk membangun Trenggalek © 2025

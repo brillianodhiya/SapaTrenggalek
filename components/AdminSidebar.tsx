@@ -18,6 +18,7 @@ import {
   Twitter,
   Instagram,
   Facebook,
+  MessageSquare,
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -46,6 +47,12 @@ export default function AdminSidebar({ activeTab }: AdminSidebarProps) {
       label: "Analitik",
       icon: BarChart3,
       href: "/admin/analytics",
+    },
+    {
+      id: "aspirasi",
+      label: "Aspirasi",
+      icon: MessageSquare,
+      href: "/admin/aspirasi",
     },
     {
       id: "search",
